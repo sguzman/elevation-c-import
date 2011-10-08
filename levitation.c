@@ -1,17 +1,9 @@
-#include <libxml/SAX2.h>
 #include <string.h>
 #include <stdio.h>
 
-static void levStartElement(void* context, const xmlChar* name, const xmlChar** attribs)
-{
-    printf("+ %s\n", name);
-}
+#include <libxml/parser.h>
 
-static void initParser(xmlSAXHandler* target)
-{
-    memset(target, 0, sizeof(*target));
-    target->startElement = levStartElement;
-}
+#include "wikiparser.h"
 
 int main(int argc, char**argv)
 {
@@ -22,7 +14,7 @@ int main(int argc, char**argv)
     }
     xmlDefaultSAXHandlerInit();
     xmlSAXHandler handler;
-    initParser(&handler);
+    initWikiParser(&handler);
     const int result = xmlSAXUserParseFile(&handler, NULL, argv[1]);
     return 0;
 }
