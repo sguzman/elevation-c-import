@@ -1,5 +1,5 @@
 #include "wikiparser.h"
-#include <stdlib.h>
+#include <string.h>
 
 #define TAGDEF(name, _a, _b) name,
 enum CurrentTag{
@@ -24,14 +24,18 @@ struct ParserState
     enum CurrentTag tag;
 };
 
-static void levStartElement(void* context, const xmlChar* name, const xmlChar** attribs)
+static void wikiStartElement(void* context, const xmlChar* name, const xmlChar** attribs)
 {
-    printf("+ %s\n", name);
+}
+
+static void wikiEndElement(void* context, const xmlChar* name)
+{
 }
 
 void initWikiParser(xmlSAXHandler* target)
 {
     memset(target, 0, sizeof(*target));
-    target->startElement = levStartElement;
+    target->startElement = wikiStartElement;
+    target->endElement = wikiEndElement;
 }
 
