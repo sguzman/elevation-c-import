@@ -10,14 +10,17 @@ enum CurrentTag{
 struct TagInfo
 {
     const char* tag;
+    const char* c_name;
     enum CurrentTag root;
 };
 
-#define TAGDEF(_, tag, root) {tag, root},
+#define TAGDEF(sym, tag, root) {tag, #sym, root},
 static struct TagInfo const tags[] ={
 #include "tags.inc"
 };
 #undef TAGDEF
+
+#define ARRAY_SIZE(array) (sizeof(array)/sizeof(*array))
 
 struct ParserState
 {
@@ -26,10 +29,29 @@ struct ParserState
 
 static void wikiStartElement(void* context, const xmlChar* name, const xmlChar** attribs)
 {
+    struct ParserState* state = context;
+    int i;
+    for(i = 0; i < ARRAY_SIZE(tags); ++i)
+    {
+        if(tags[i].root == state->tag)
+        {
+            if(!strcmp(tags[i].tag, BAD_CAST name))
+            {
+                printf("transit %s->%s\n", tags[state->tag].c_name, tags[i].c_name);
+                state->tag = i;
+            }
+        }
+    }
 }
 
 static void wikiEndElement(void* context, const xmlChar* name)
 {
+    struct ParserState* state = context;
+    if(!strcmp(tags[state->tag].tag, BAD_CAST name))
+    {
+        printf("up      %s->%s\n", tags[state->tag].c_name, tags[tags[state->tag].root].c_name);
+        state->tag = tags[state->tag].root;
+    }
 }
 
 void initWikiParser(xmlSAXHandler* target, struct ParserState* state)
