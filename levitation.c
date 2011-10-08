@@ -12,9 +12,6 @@ int main(int argc, char**argv)
         fprintf(stderr, "Usage: %s filename\n", argv[0]);
         return 1;
     }
-    xmlDefaultSAXHandlerInit();
-    xmlSAXHandler handler;
-    initWikiParser(&handler);
-    const int result = xmlSAXUserParseFile(&handler, NULL, argv[1]);
+    const int result = parseWiki(argv[1]);
     return 0;
 }

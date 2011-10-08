@@ -7,7 +7,7 @@ extern "C"{
 
 #include <libxml/SAX2.h>
 
-void initWikiParser(xmlSAXHandler* target);
+int parseWiki(const char* file);
 
 #ifdef __cplusplus
 }

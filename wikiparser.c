@@ -32,10 +32,21 @@ static void wikiEndElement(void* context, const xmlChar* name)
 {
 }
 
-void initWikiParser(xmlSAXHandler* target)
+void initWikiParser(xmlSAXHandler* target, struct ParserState* state)
 {
     memset(target, 0, sizeof(*target));
     target->startElement = wikiStartElement;
     target->endElement = wikiEndElement;
+
+    memset(state, 0, sizeof(*state));
+    state->tag = ctNone;
 }
 
+int parseWiki(const char* file)
+{
+    xmlDefaultSAXHandlerInit();
+    xmlSAXHandler handler;
+    struct ParserState state;
+    initWikiParser(&handler, &state);
+    return xmlSAXUserParseFile(&handler, &state, file);
+}
