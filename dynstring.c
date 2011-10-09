@@ -3,28 +3,31 @@
 #include <string.h>
 #include <stdlib.h>
 
-int setString(struct DynString* string, char* input)
+int appendString(struct DynString* string, const char* input, int length)
 {
-    const int inlen = strlen(input);
-    if(inlen > string->size)
+    const int totalSize = string->length + length + 1;
+    if(totalSize > string->size)
     {
-        free(string->data);
-        string->size = 0;
-        /* no realloc here, since the memory will be overwritten entirely, so
-           the memmove of realloc is not needed */
-        string->data = malloc(inlen+1);
+        string->size= 0;
+        string->data = realloc(string->data, totalSize);
         if(!string->data)
         {
             return -1;
         }
-        string->size = inlen + 1;
+        string->size = totalSize;
     }
-    strcpy(string->data, input);
-    string->length = inlen;
+    strncpy(string->data + string->length, input, length);
+    string->length = totalSize - 1;
+    string->data[totalSize - 1] = 0;
     return 0;
 }
 
-int clearString(struct DynString* string)
+void clearString(struct DynString* string)
 {
     string->length = 0;
+}
+
+void freeString(struct DynString* string)
+{
+    free(string->data);
 }

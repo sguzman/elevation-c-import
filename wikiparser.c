@@ -1,10 +1,15 @@
 #include "wikiparser.h"
 #include <string.h>
+#include <stddef.h>
+
+#include "dynstring.h"
 
 #define TAGDEF(name, _a, _b, _act, _aparam) name,
+#define TARGET(_name)
 enum CurrentTag{
 #include "tags.inc"
 };
+#undef TARGET
 #undef TAGDEF
 
 enum TagAction{actNone, actStore, actCheckStore, actBlob};
@@ -15,9 +20,22 @@ struct TagInfo
     const char* c_name;
     enum CurrentTag root;
     enum TagAction action;
-    int actionParameer;
+    int actionParameter;
 };
 
+struct ParserState
+{
+    enum CurrentTag tag;
+    struct DynString siteName;
+    struct DynString siteBase;
+    struct DynString pageTitle;
+    struct DynString revTime;
+    struct DynString revComment;
+    struct DynString revIp;
+    struct DynString revUser;
+};
+
+#define TARGET(name) (offsetof(struct ParserState, name))
 #define TAGDEF(sym, tag, root, action, param) {tag, #sym, root, action, param},
 static struct TagInfo const tags[] ={
 #include "tags.inc"
@@ -25,11 +43,6 @@ static struct TagInfo const tags[] ={
 #undef TAGDEF
 
 #define ARRAY_SIZE(array) (sizeof(array)/sizeof(*array))
-
-struct ParserState
-{
-    enum CurrentTag tag;
-};
 
 static void wikiStartElement(void* context, const xmlChar* name, const xmlChar** attribs)
 {
@@ -39,7 +52,7 @@ static void wikiStartElement(void* context, const xmlChar* name, const xmlChar**
     {
         if(tags[i].root == state->tag)
         {
-            if(!strcmp(tags[i].tag, BAD_CAST name))
+            if(!strcmp(tags[i].tag, (const char*)name))
             {
                 //printf("transit %s->%s\n", tags[state->tag].c_name, tags[i].c_name);
                 state->tag = i;
@@ -53,10 +66,21 @@ static void wikiStartElement(void* context, const xmlChar* name, const xmlChar**
 static void wikiEndElement(void* context, const xmlChar* name)
 {
     struct ParserState* state = context;
-    if(!strcmp(tags[state->tag].tag, BAD_CAST name))
+    if(!strcmp(tags[state->tag].tag, (const char*)name))
     {
         //printf("up      %s->%s\n", tags[state->tag].c_name, tags[tags[state->tag].root].c_name);
         state->tag = tags[state->tag].root;
+    }
+}
+
+static void wikiGetText(void* context, const xmlChar* content, int len)
+{
+    struct ParserState* state = context;
+    if(actStore == tags[state->tag].action)
+    {
+        struct DynString* string = context + tags[state->tag].actionParameter;
+        appendString(string, (const char*)content, len);
+        printf("Store %s->%s\n", tags[state->tag].c_name, string->data);
     }
 }
 
@@ -65,6 +89,7 @@ void initWikiParser(xmlSAXHandler* target, struct ParserState* state)
     memset(target, 0, sizeof(*target));
     target->startElement = wikiStartElement;
     target->endElement = wikiEndElement;
+    target->characters = wikiGetText;
 
     memset(state, 0, sizeof(*state));
     state->tag = ctNone;

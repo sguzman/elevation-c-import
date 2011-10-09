@@ -12,8 +12,9 @@ struct DynString
     int size;
 };
 
-int setString(struct DynString* string, char* input);
-int clearString(struct DynString* string);
+int appendString(struct DynString* string, const char* input, int length);
+void clearString(struct DynString* string);
+void freeString(struct DynString* string);
 
 #ifdef __cplusplus
 }

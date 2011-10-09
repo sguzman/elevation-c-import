@@ -12,6 +12,6 @@ int main(int argc, char**argv)
         fprintf(stderr, "Usage: %s filename\n", argv[0]);
         return 1;
     }
-    const int result = parseWiki(argv[1]);
+    parseWiki(argv[1]);
     return 0;
 }
