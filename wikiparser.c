@@ -44,6 +44,31 @@ static struct TagInfo const tags[] ={
 
 #define ARRAY_SIZE(array) (sizeof(array)/sizeof(*array))
 
+static void wikiHandleStartElement(struct ParserState* state)
+{
+    switch(tags[state->tag].action)
+    {
+        case actCleanSite:
+            clearString(&state->siteName);
+            clearString(&state->siteBase);
+        break;
+
+        case actCleanPage:
+            clearString(&state->pageTitle);
+        break;
+
+        case actCleanRev:
+            clearString(&state->revTime);
+            clearString(&state->revComment);
+            clearString(&state->revIp);
+            clearString(&state->revUser);
+        break;
+
+        default: // ignore other actions
+        break;
+    }
+}
+
 static void wikiStartElement(void* context, const xmlChar* name, const xmlChar** attribs)
 {
     struct ParserState* state = context;
@@ -54,8 +79,8 @@ static void wikiStartElement(void* context, const xmlChar* name, const xmlChar**
         {
             if(!strcmp(tags[i].tag, (const char*)name))
             {
-                //printf("transit %s->%s\n", tags[state->tag].c_name, tags[i].c_name);
                 state->tag = i;
+                wikiHandleStartElement(state);
                 return;
             }
         }
