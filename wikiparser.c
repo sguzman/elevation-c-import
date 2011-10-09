@@ -12,7 +12,7 @@ enum CurrentTag{
 #undef TARGET
 #undef TAGDEF
 
-enum TagAction{actNone, actStore, actCheckStore, actBlob};
+enum TagAction{actNone, actStore, actCheckStore, actBlob, actCleanSite, actCleanPage, actCleanRev};
 
 struct TagInfo
 {
