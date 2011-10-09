@@ -1,7 +1,7 @@
 #include "wikiparser.h"
 #include <string.h>
 
-#define TAGDEF(name, _a, _b) name,
+#define TAGDEF(name, _a, _b, _act, _aparam) name,
 enum CurrentTag{
 #include "tags.inc"
 };
@@ -14,7 +14,7 @@ struct TagInfo
     enum CurrentTag root;
 };
 
-#define TAGDEF(sym, tag, root) {tag, #sym, root},
+#define TAGDEF(sym, tag, root, _act, _param) {tag, #sym, root},
 static struct TagInfo const tags[] ={
 #include "tags.inc"
 };
@@ -37,11 +37,13 @@ static void wikiStartElement(void* context, const xmlChar* name, const xmlChar**
         {
             if(!strcmp(tags[i].tag, BAD_CAST name))
             {
-                printf("transit %s->%s\n", tags[state->tag].c_name, tags[i].c_name);
+                //printf("transit %s->%s\n", tags[state->tag].c_name, tags[i].c_name);
                 state->tag = i;
+                return;
             }
         }
     }
+    printf("Ignore tag %s in state %s\n", name, tags[state->tag].c_name);
 }
 
 static void wikiEndElement(void* context, const xmlChar* name)
@@ -49,7 +51,7 @@ static void wikiEndElement(void* context, const xmlChar* name)
     struct ParserState* state = context;
     if(!strcmp(tags[state->tag].tag, BAD_CAST name))
     {
-        printf("up      %s->%s\n", tags[state->tag].c_name, tags[tags[state->tag].root].c_name);
+        //printf("up      %s->%s\n", tags[state->tag].c_name, tags[tags[state->tag].root].c_name);
         state->tag = tags[state->tag].root;
     }
 }
