@@ -7,14 +7,18 @@ enum CurrentTag{
 };
 #undef TAGDEF
 
+enum TagAction{actNone, actStore, actCheckStore, actBlob};
+
 struct TagInfo
 {
     const char* tag;
     const char* c_name;
     enum CurrentTag root;
+    enum TagAction action;
+    int actionParameer;
 };
 
-#define TAGDEF(sym, tag, root, _act, _param) {tag, #sym, root},
+#define TAGDEF(sym, tag, root, action, param) {tag, #sym, root, action, param},
 static struct TagInfo const tags[] ={
 #include "tags.inc"
 };
