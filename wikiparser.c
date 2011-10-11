@@ -84,6 +84,7 @@ static void wikiHandleStartElement(struct ParserState* state)
         break;
 
         case actBlob:
+            printf("progress %s\n", state->pageTitle.data);
             state->revision.blobref++;
             start_blob(&state->revision);
         break;
@@ -141,6 +142,10 @@ static void wikiGetText(void* context, const xmlChar* content, int len)
     {
         struct DynString* string = context + tags[state->tag].actionParameter;
         appendString(string, (const char*)content, len);
+    }
+    else if(actBlob == tags[state->tag].action)
+    {
+        fwrite(content, len, 1, stdout);
     }
 }
 
