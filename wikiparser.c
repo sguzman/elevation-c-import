@@ -31,6 +31,7 @@ struct RevData
     struct DynString comment;
     struct DynString ip;
     struct DynString user;
+    int blobref;
 };
 
 struct ParserState
