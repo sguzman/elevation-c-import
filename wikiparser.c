@@ -53,6 +53,16 @@ static struct TagInfo const tags[] ={
 
 #define ARRAY_SIZE(array) (sizeof(array)/sizeof(*array))
 
+static void start_blob(struct RevData const* revision)
+{
+    printf("blob\nmark :%d\ndata <<EOF_%p_PAGE\n", revision->blobref, revision);
+}
+
+static void stop_blob(struct RevData const* revision)
+{
+    printf("\nEOF_%p_PAGE\n\n", revision);
+}
+
 static void wikiHandleStartElement(struct ParserState* state)
 {
     switch(tags[state->tag].action)
@@ -73,7 +83,25 @@ static void wikiHandleStartElement(struct ParserState* state)
             clearString(&state->revision.user);
         break;
 
+        case actBlob:
+            state->revision.blobref++;
+            start_blob(&state->revision);
+        break;
+
         default: // ignore other actions
+        break;
+    }
+}
+
+static void wikiHandleStopElement(struct ParserState* state)
+{
+    switch(tags[state->tag].action)
+    {
+        case actBlob:
+            stop_blob(&state->revision);
+        break;
+
+        default:
         break;
     }
 }
@@ -101,6 +129,7 @@ static void wikiEndElement(void* context, const xmlChar* name)
     struct ParserState* state = context;
     if(!strcmp(tags[state->tag].tag, (const char*)name))
     {
+        wikiHandleStopElement(state);
         state->tag = tags[state->tag].root;
     }
 }
