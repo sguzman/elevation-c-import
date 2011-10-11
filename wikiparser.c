@@ -94,7 +94,6 @@ static void wikiStartElement(void* context, const xmlChar* name, const xmlChar**
             }
         }
     }
-    printf("Ignore tag %s in state %s\n", name, tags[state->tag].c_name);
 }
 
 static void wikiEndElement(void* context, const xmlChar* name)
@@ -102,7 +101,6 @@ static void wikiEndElement(void* context, const xmlChar* name)
     struct ParserState* state = context;
     if(!strcmp(tags[state->tag].tag, (const char*)name))
     {
-        //printf("up      %s->%s\n", tags[state->tag].c_name, tags[tags[state->tag].root].c_name);
         state->tag = tags[state->tag].root;
     }
 }
@@ -114,7 +112,6 @@ static void wikiGetText(void* context, const xmlChar* content, int len)
     {
         struct DynString* string = context + tags[state->tag].actionParameter;
         appendString(string, (const char*)content, len);
-        printf("Store %s->%s\n", tags[state->tag].c_name, string->data);
     }
 }
 
