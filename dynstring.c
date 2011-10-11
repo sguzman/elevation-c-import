@@ -22,6 +22,11 @@ int appendString(struct DynString* string, const char* input, int length)
     return 0;
 }
 
+bool stringIsEmpty(struct DynString* string)
+{
+    return 0 == string->length;
+}
+
 void clearString(struct DynString* string)
 {
     string->length = 0;
