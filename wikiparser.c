@@ -34,6 +34,7 @@ struct ParserState
     struct DynString siteBase;
     struct DynString pageTitle;
     struct RevisionStore revs;
+    int blobref;
 };
 
 #define TARGET(name) (offsetof(struct ParserState, name))
@@ -45,6 +46,16 @@ static struct TagInfo const tags[] ={
 #undef TAGDEF
 
 #define ARRAY_SIZE(array) (sizeof(array)/sizeof(*array))
+
+static void start_blob(struct RevData const* revision)
+{
+    printf("blob\nmark :%d\ndata <<EOF_%p_PAGE\n", revision->blobref, revision);
+}
+
+static void stop_blob(struct RevData const* revision)
+{
+    printf("\nEOF_%p_PAGE\n\n", revision);
+}
 
 static void wikiHandleStartElement(struct ParserState* state)
 {
@@ -64,15 +75,33 @@ static void wikiHandleStartElement(struct ParserState* state)
             revision_new(&state->revs);
         break;
 
+        case actBlob:
+            state->blobref++;
+            state->revs.current->revision.blobref = state->blobref;
+            start_blob(&state->revs.current->revision);
+        break;
+
         case actCheckStore:
-            if (!stringIsEmpty(&state->pageTitle))
+            if(!stringIsEmpty(&state->pageTitle))
             {
-                fprintf(stderr, "mehrere Seitentitel für %s\n", state->pageTitle.data);
+                fprintf(stderr, "Error: more than one title in page %s", state->pageTitle.data);
                 exit(1);
             }
         break;
-
         default: // ignore other actions
+        break;
+    }
+}
+
+static void wikiHandleStopElement(struct ParserState* state)
+{
+    switch(tags[state->tag].action)
+    {
+        case actBlob:
+            stop_blob(&state->revs.current->revision);
+        break;
+
+        default:
         break;
     }
 }
@@ -100,28 +129,44 @@ static void wikiEndElement(void* context, const xmlChar* name)
     struct ParserState* state = context;
     if(!strcmp(tags[state->tag].tag, (const char*)name))
     {
+        wikiHandleStopElement(state);
         state->tag = tags[state->tag].root;
     }
 }
 
 static void wikiGetText(void* context, const xmlChar* content, int len)
 {
-    struct ParserState* state = context;
+
+    struct ParserState* const state = context;
+    const enum TagAction action = tags[state->tag].action;
     struct DynString* string = NULL;
 
-    if(actStore == tags[state->tag].action)
+    switch(action)
     {
-        string = context + tags[state->tag].actionParameter;
-    }
+        case actCheckStore:
+        case actStore:
+            string = context + tags[state->tag].actionParameter;
+        break;
 
-    if(actRevStore == tags[state->tag].action)
-    {
-        string = ((void*)state->revs.current) + tags[state->tag].actionParameter;
+        case actRevStore:
+            string = ((void*)state->revs.current) + tags[state->tag].actionParameter;
+        break;
+
+        case actBlob:
+            fwrite(content, len, 1, stdout);
+        break;
+
+        default:
+        break;
     }
 
     if(string)
     {
         appendString(string, (const char*)content, len);
+        if(actCheckStore == action)
+        {
+            printf("progress %s\n", string->data);
+        }
     }
 }
 
