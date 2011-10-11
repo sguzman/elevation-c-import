@@ -6,9 +6,11 @@
 
 #define TAGDEF(name, _a, _b, _act, _aparam) name,
 #define TARGET(_name)
+#define REV_TARGET(_name)
 enum CurrentTag{
 #include "tags.inc"
 };
+#undef REV_TARGET
 #undef TARGET
 #undef TAGDEF
 
@@ -23,19 +25,25 @@ struct TagInfo
     int actionParameter;
 };
 
+struct RevData
+{
+    struct DynString time;
+    struct DynString comment;
+    struct DynString ip;
+    struct DynString user;
+};
+
 struct ParserState
 {
     enum CurrentTag tag;
     struct DynString siteName;
     struct DynString siteBase;
     struct DynString pageTitle;
-    struct DynString revTime;
-    struct DynString revComment;
-    struct DynString revIp;
-    struct DynString revUser;
+    struct RevData revision;
 };
 
 #define TARGET(name) (offsetof(struct ParserState, name))
+#define REV_TARGET(name) (offsetof(struct ParserState, revision.name))
 #define TAGDEF(sym, tag, root, action, param) {tag, #sym, root, action, param},
 static struct TagInfo const tags[] ={
 #include "tags.inc"
@@ -58,10 +66,10 @@ static void wikiHandleStartElement(struct ParserState* state)
         break;
 
         case actCleanRev:
-            clearString(&state->revTime);
-            clearString(&state->revComment);
-            clearString(&state->revIp);
-            clearString(&state->revUser);
+            clearString(&state->revision.time);
+            clearString(&state->revision.comment);
+            clearString(&state->revision.ip);
+            clearString(&state->revision.user);
         break;
 
         default: // ignore other actions
