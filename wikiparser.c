@@ -84,11 +84,17 @@ static void wikiHandleStartElement(struct ParserState* state)
         break;
 
         case actBlob:
-            printf("progress %s\n", state->pageTitle.data);
             state->revision.blobref++;
             start_blob(&state->revision);
         break;
 
+        case actCheckStore:
+            if(!stringIsEmpty(&state->pageTitle))
+            {
+                fprintf(stderr, "Error: more than one title in page %s", state->pageTitle.data);
+                exit(1);
+            }
+        break;
         default: // ignore other actions
         break;
     }
@@ -137,13 +143,15 @@ static void wikiEndElement(void* context, const xmlChar* name)
 
 static void wikiGetText(void* context, const xmlChar* content, int len)
 {
-    struct ParserState* state = context;
-    if(actStore == tags[state->tag].action)
+    struct ParserState* const state = context;
+    const enum TagAction action = tags[state->tag].action;
+    if((actStore == action) || (actCheckStore == action))
     {
-        struct DynString* string = context + tags[state->tag].actionParameter;
+        struct DynString* const string = context + tags[state->tag].actionParameter;
         appendString(string, (const char*)content, len);
+        printf("progress %s\n", string->data);
     }
-    else if(actBlob == tags[state->tag].action)
+    else if(actBlob == action)
     {
         fwrite(content, len, 1, stdout);
     }
