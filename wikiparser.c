@@ -1,8 +1,10 @@
 #include "wikiparser.h"
 #include <string.h>
 #include <stddef.h>
+#include <stdlib.h>
 
 #include "dynstring.h"
+#include "revlist.h"
 
 #define TAGDEF(name, _a, _b, _act, _aparam) name,
 #define TARGET(_name)
@@ -14,7 +16,7 @@ enum CurrentTag{
 #undef TARGET
 #undef TAGDEF
 
-enum TagAction{actNone, actStore, actCheckStore, actBlob, actCleanSite, actCleanPage, actCleanRev};
+enum TagAction{actNone, actStore, actRevStore, actCheckStore, actBlob, actCleanSite, actCleanPage, actInitRev};
 
 struct TagInfo
 {
@@ -25,25 +27,18 @@ struct TagInfo
     int actionParameter;
 };
 
-struct RevData
-{
-    struct DynString time;
-    struct DynString comment;
-    struct DynString ip;
-    struct DynString user;
-};
-
 struct ParserState
 {
     enum CurrentTag tag;
     struct DynString siteName;
     struct DynString siteBase;
     struct DynString pageTitle;
-    struct RevData revision;
+    struct RevisionStore revs;
+    int blobref;
 };
 
 #define TARGET(name) (offsetof(struct ParserState, name))
-#define REV_TARGET(name) (offsetof(struct ParserState, revision.name))
+#define REV_TARGET(name) (offsetof(struct RevisionList, revision.name))
 #define TAGDEF(sym, tag, root, action, param) {tag, #sym, root, action, param},
 static struct TagInfo const tags[] ={
 #include "tags.inc"
@@ -63,13 +58,19 @@ static void wikiHandleStartElement(struct ParserState* state)
 
         case actCleanPage:
             clearString(&state->pageTitle);
+            revision_release(&state->revs);
         break;
 
-        case actCleanRev:
-            clearString(&state->revision.time);
-            clearString(&state->revision.comment);
-            clearString(&state->revision.ip);
-            clearString(&state->revision.user);
+        case actInitRev:
+            revision_new(&state->revs);
+        break;
+
+        case actCheckStore:
+            if (!stringIsEmpty(&state->pageTitle))
+            {
+                fprintf(stderr, "mehrere Seitentitel für %s\n", state->pageTitle.data);
+                exit(1);
+            }
         break;
 
         default: // ignore other actions
@@ -109,9 +110,20 @@ static void wikiEndElement(void* context, const xmlChar* name)
 static void wikiGetText(void* context, const xmlChar* content, int len)
 {
     struct ParserState* state = context;
+    struct DynString* string = NULL;
+
     if(actStore == tags[state->tag].action)
     {
-        struct DynString* string = context + tags[state->tag].actionParameter;
+        string = context + tags[state->tag].actionParameter;
+    }
+
+    if(actRevStore == tags[state->tag].action)
+    {
+        string = ((void*)state->revs.current) + tags[state->tag].actionParameter;
+    }
+
+    if(string)
+    {
         appendString(string, (const char*)content, len);
         printf("Store %s->%s\n", tags[state->tag].c_name, string->data);
     }
@@ -126,6 +138,7 @@ void initWikiParser(xmlSAXHandler* target, struct ParserState* state)
 
     memset(state, 0, sizeof(*state));
     state->tag = ctNone;
+    revision_init(&state->revs);
 }
 
 int parseWiki(const char* file)
