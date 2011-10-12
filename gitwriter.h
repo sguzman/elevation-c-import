@@ -16,6 +16,10 @@ struct RevData
     int blobref;
 };
 
+void start_blob(struct RevData const* revision);
+void stop_blob(struct RevData const* revision);
+void commit_rev(struct RevData const* revision, struct DynString const* title);
+
 #ifdef __cplusplus
 }
 #endif
