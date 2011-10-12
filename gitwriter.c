@@ -64,7 +64,7 @@ static void print_author(struct RevData const* revision, struct DynString const*
     }
 }
 
-void commit_rev(struct RevData const* revision, struct DynString const* title, const char* base_rev)
+void commit_rev(struct RevData const* revision, struct DynString const* title, bool start_branch)
 {
     static struct DynString file_name;
     static struct DynString git_date;
@@ -81,9 +81,9 @@ void commit_rev(struct RevData const* revision, struct DynString const* title, c
     {
         printf("data <<EOF\n/* no comment */\nEOF\n\n");
     }
-    if(base_rev)
+    if(start_branch)
     {
-        printf("from %s\n", base_rev);
+        printf("from refs/tags/import_initial\n");
     }
 }
 

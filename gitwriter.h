@@ -1,6 +1,8 @@
 #ifndef GITWRITER_H__
 #define GITWRITER_H__
 
+#include <stdbool.h>
+
 #include "dynstring.h"
 
 #ifdef __cplusplus
@@ -18,7 +20,7 @@ struct RevData
 
 void start_blob(struct RevData const* revision);
 void stop_blob(struct RevData const* revision);
-void commit_rev(struct RevData const* revision, struct DynString const* title, const char* base_rev);
+void commit_rev(struct RevData const* revision, struct DynString const* title, bool start_branch);
 
 #ifdef __cplusplus
 }
