@@ -3,6 +3,7 @@
 #include <stddef.h>
 
 #include "dynstring.h"
+#include "gitwriter.h"
 
 #define TAGDEF(name, _a, _b, _act, _aparam) name,
 #define TARGET(_name)
@@ -23,15 +24,6 @@ struct TagInfo
     enum CurrentTag root;
     enum TagAction action;
     int actionParameter;
-};
-
-struct RevData
-{
-    struct DynString time;
-    struct DynString comment;
-    struct DynString ip;
-    struct DynString user;
-    int blobref;
 };
 
 struct ParserState
