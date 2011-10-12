@@ -18,7 +18,7 @@ bool stringIsEmpty(struct DynString const* string)
     return 0 == string->length;
 }
 
-int stringLength(struct DynString* string)
+int stringLength(struct DynString const* string)
 {
     return string->length;
 }
