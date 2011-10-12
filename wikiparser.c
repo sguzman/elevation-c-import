@@ -53,6 +53,77 @@ static struct TagInfo const tags[] ={
 
 #define ARRAY_SIZE(array) (sizeof(array)/sizeof(*array))
 
+static int rewrite_filename_chars(char* dest, const char* source)
+{
+    int result;
+    for(result=0; *source != '\0'; result++, source++)
+    {
+        const char input = *source;
+        if(    ((input >= '0')&& (input <= '9'))
+            || ((input >= 'a')&& (input <= 'z'))
+            || ((input >= 'A')&& (input <= 'Z'))
+            || (input == '_') || (input == '-')
+            || (input == '+'))
+        {
+            if(dest)
+            {
+                dest[result] = *source;
+            }
+            result++;
+        }
+        else if(input == ' ')
+        {
+            if(dest)
+            {
+                dest[result] = '_';
+            }
+            result++;
+        }
+        else
+        {
+            if(dest)
+            {
+                sprintf(dest+result, "%%%02x", (unsigned char)input);
+            }
+            result += 3;
+        }
+    }
+    if(dest)
+    {
+        dest[result] = '\0';
+    }
+    result++;
+    return result;
+}
+
+static void create_filename(struct DynString* dest, struct DynString const* source)
+{
+    setStringMinCapacity(dest, rewrite_filename_chars(NULL, source->data));
+    rewrite_filename_chars(dest->data, source->data);
+}
+
+static void wikiDateToGitDate(struct DynString* dest, struct DynString const* source)
+{
+}
+
+static void print_author(struct RevData const* revision, struct DynString const* date)
+{
+    if(!stringIsEmpty(&revision->user))
+    {
+        printf("author %s <%s> %s\n", revision->user.data, revision->user.data, date->data);
+    }
+}
+
+static void commit_rev(struct RevData const* revision, struct DynString const* title)
+{
+    static struct DynString file_name;
+    static struct DynString git_date;
+    wikiDateToGitDate(&git_date, &revision->time);
+    create_filename(&file_name, title);
+    printf("commit refs/heads/%s\n", file_name.data);
+    print_author(revision, &git_date);
+}
+
 static void start_blob(struct RevData const* revision)
 {
     printf("blob\nmark :%d\ndata <<EOF_%p_PAGE\n", revision->blobref, revision);
@@ -106,6 +177,10 @@ static void wikiHandleStopElement(struct ParserState* state)
     {
         case actBlob:
             stop_blob(&state->revision);
+        break;
+
+        case actCleanRev:
+            commit_rev(&state->revision, &state->pageTitle);
         break;
 
         default:
