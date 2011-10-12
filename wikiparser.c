@@ -91,7 +91,7 @@ static void wikiHandleStopElement(struct ParserState* state)
         break;
 
         case actCleanRev:
-            commit_rev(&state->revision, &state->pageTitle);
+            commit_rev(&state->revision, &state->pageTitle, NULL);
         break;
 
         default:

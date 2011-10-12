@@ -18,7 +18,7 @@ struct RevData
 
 void start_blob(struct RevData const* revision);
 void stop_blob(struct RevData const* revision);
-void commit_rev(struct RevData const* revision, struct DynString const* title);
+void commit_rev(struct RevData const* revision, struct DynString const* title, const char* base_rev);
 
 #ifdef __cplusplus
 }

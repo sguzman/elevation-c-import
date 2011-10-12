@@ -64,7 +64,7 @@ static void print_author(struct RevData const* revision, struct DynString const*
     }
 }
 
-void commit_rev(struct RevData const* revision, struct DynString const* title)
+void commit_rev(struct RevData const* revision, struct DynString const* title, const char* base_rev)
 {
     static struct DynString file_name;
     static struct DynString git_date;
@@ -72,6 +72,19 @@ void commit_rev(struct RevData const* revision, struct DynString const* title)
     create_filename(&file_name, title);
     printf("commit refs/heads/%s\n", file_name.data);
     print_author(revision, &git_date);
+    printf("committer Jon Doe <jon.doe@example.com> now\n");
+    if(!stringIsEmpty(&revision->comment))
+    {
+        printf("data %d\n%s\n", stringLength(&revision->comment), revision->comment.data);
+    }
+    else
+    {
+        printf("data <<EOF\n/* no comment */\nEOF\n\n");
+    }
+    if(base_rev)
+    {
+        printf("from %s\n", base_rev);
+    }
 }
 
 void start_blob(struct RevData const* revision)
