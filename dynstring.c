@@ -2,29 +2,39 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
-int appendString(struct DynString* string, const char* input, int length)
+void appendString(struct DynString* string, const char* input, int length)
 {
     const int totalSize = string->length + length + 1;
-    if(totalSize > string->size)
-    {
-        string->size= 0;
-        string->data = realloc(string->data, totalSize);
-        if(!string->data)
-        {
-            return -1;
-        }
-        string->size = totalSize;
-    }
+    setStringMinCapacity(string, totalSize);
     strncpy(string->data + string->length, input, length);
     string->length = totalSize - 1;
     string->data[totalSize - 1] = 0;
-    return 0;
 }
 
 bool stringIsEmpty(struct DynString* string)
 {
     return 0 == string->length;
+}
+
+int stringLength(struct DynString* string)
+{
+    return string->length;
+}
+
+void setStringMinCapacity(struct DynString* string, int size)
+{
+    if(size > string->size)
+    {
+        string->data = realloc(string->data, size);
+        if(!string->data)
+        {
+            fprintf(stderr, "failed to grow %d bytre storage to %d bytes.\n", string->size, size);
+            exit(1);
+        }
+        string->size = size;
+    }
 }
 
 void clearString(struct DynString* string)
