@@ -14,8 +14,10 @@ struct DynString
     int size;
 };
 
-int appendString(struct DynString* string, const char* input, int length);
-bool stringIsEmpty(struct DynString* string);
+void appendString(struct DynString* string, const char* input, int length);
+bool stringIsEmpty(struct DynString const* string);
+int stringLength(struct DynString* string);
+void setStringMinCapacity(struct DynString* string, int new_size);
 void clearString(struct DynString* string);
 void freeString(struct DynString* string);
 
