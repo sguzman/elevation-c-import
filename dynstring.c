@@ -13,7 +13,7 @@ void appendString(struct DynString* string, const char* input, int length)
     string->data[totalSize - 1] = 0;
 }
 
-bool stringIsEmpty(struct DynString* string)
+bool stringIsEmpty(struct DynString const* string)
 {
     return 0 == string->length;
 }
