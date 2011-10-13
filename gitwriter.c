@@ -6,7 +6,7 @@
 static int rewrite_filename_chars(char* dest, const char* source)
 {
     int result;
-    for(result=0; *source != '\0'; result++, source++)
+    for(result=0; *source != '\0'; source++)
     {
         const char input = *source;
         if(    ((input >= '0')&& (input <= '9'))
