@@ -85,6 +85,7 @@ void commit_rev(struct RevData const* revision, struct DynString const* title, b
     {
         printf("from refs/tags/import_initial\n");
     }
+    printf("M 644 :%d %s\n", revision->blobref, file_name.data);
 }
 
 void start_blob(struct RevData const* revision)
