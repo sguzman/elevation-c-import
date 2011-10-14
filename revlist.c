@@ -37,7 +37,9 @@ void revision_new(struct RevisionStore* store)
     }
     else
     {
-        store->current = alloc_revlist();
+        struct RevisionList* new_rev = alloc_revlist();
+        store->current->next = new_rev;
+        store->current = new_rev;
     }
 }
 
