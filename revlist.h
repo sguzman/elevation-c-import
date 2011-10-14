@@ -3,19 +3,11 @@
 
 #include <stdbool.h>
 #include "dynstring.h"
+#include "gitwriter.h"
 
 #ifdef __cplusplus
 extern "C"{
 #endif
-
-struct RevData
-{
-    struct DynString time;
-    struct DynString comment;
-    struct DynString ip;
-    struct DynString user;
-    int blobref;
-};
 
 struct RevisionList
 {

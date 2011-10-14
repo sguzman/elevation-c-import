@@ -5,6 +5,7 @@
 
 #include "dynstring.h"
 #include "revlist.h"
+#include "gitwriter.h"
 
 #define TAGDEF(name, _a, _b, _act, _aparam) name,
 #define TARGET(_name)
@@ -46,16 +47,6 @@ static struct TagInfo const tags[] ={
 #undef TAGDEF
 
 #define ARRAY_SIZE(array) (sizeof(array)/sizeof(*array))
-
-static void start_blob(struct RevData const* revision)
-{
-    printf("blob\nmark :%d\ndata <<EOF_%p_PAGE\n", revision->blobref, revision);
-}
-
-static void stop_blob(struct RevData const* revision)
-{
-    printf("\nEOF_%p_PAGE\n\n", revision);
-}
 
 static void wikiHandleStartElement(struct ParserState* state)
 {
@@ -100,6 +91,29 @@ static void wikiHandleStopElement(struct ParserState* state)
         case actBlob:
             stop_blob(&state->revs.current->revision);
         break;
+
+#if 0
+    /* TODO: Activate me */
+        case actInitRev:
+        {
+            struct RevisionList* to_commit;
+            /* commit many revisions */
+            to_commit = state->revs.base;
+            do 
+            {
+                struct CommitData const commit = {
+                    &to_commit->revision,
+                    &state->pageTitle,
+                    NULL,
+                    "01 Apr 12:23:42 2000",
+                    "Jon Doe <jon.doe@example.com>"
+                };
+                commit_rev(&commit);
+            }
+            while(to_commit && to_commit != state->revs.current);
+        }
+        break;
+#endif
 
         default:
         break;
