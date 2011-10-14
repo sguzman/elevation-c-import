@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "dynstring.h"
 #include "revlist.h"
@@ -62,10 +63,6 @@ static void wikiHandleStartElement(struct ParserState* state)
             revision_release(&state->revs);
         break;
 
-        case actInitRev:
-            revision_new(&state->revs);
-        break;
-
         case actBlob:
             state->blobref++;
             state->revs.current->revision.blobref = state->blobref;
@@ -92,14 +89,15 @@ static void wikiHandleStopElement(struct ParserState* state)
             stop_blob(&state->revs.current->revision);
         break;
 
-#if 0
-    /* TODO: Activate me */
         case actInitRev:
+            revision_new(&state->revs);
+        break;
+
+        case actCleanPage:
         {
             struct RevisionList* to_commit;
             /* commit many revisions */
-            to_commit = state->revs.base;
-            do 
+            for(to_commit = state->revs.base; to_commit != state->revs.current; to_commit = to_commit->next)
             {
                 struct CommitData const commit = {
                     &to_commit->revision,
@@ -113,7 +111,6 @@ static void wikiHandleStopElement(struct ParserState* state)
             while(to_commit && to_commit != state->revs.current);
         }
         break;
-#endif
 
         default:
         break;
