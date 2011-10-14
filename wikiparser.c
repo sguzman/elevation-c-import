@@ -91,7 +91,16 @@ static void wikiHandleStopElement(struct ParserState* state)
         break;
 
         case actCleanRev:
-            commit_rev(&state->revision, &state->pageTitle, NULL);
+        {
+            struct CommitData const commit = {
+                &state->revision,
+                &state->pageTitle,
+                NULL,
+                "01 Apr 12:23:42 2000",
+                "Jon Doe <jon.doe@example.com>"
+            };
+            commit_rev(&commit);
+        }
         break;
 
         default:

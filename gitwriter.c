@@ -83,28 +83,28 @@ static void print_author(struct RevData const* revision, const char* date)
     }
 }
 
-void commit_rev(struct RevData const* revision, struct DynString const* title, bool start_branch)
+void commit_rev(struct CommitData const* commit)
 {
     static struct DynString file_name;
     static char git_date[] = "22 Feb 05:42:23 2097";
-    wikiDateToGitDate(git_date, revision->time.data);
-    create_filename(&file_name, title);
+    wikiDateToGitDate(git_date, commit->revision->time.data);
+    create_filename(&file_name, commit->title);
     printf("commit refs/heads/%s\n", file_name.data);
-    print_author(revision, git_date);
-    printf("committer Jon Doe <jon.doe@example.com> now\n");
-    if(!stringIsEmpty(&revision->comment))
+    print_author(commit->revision, git_date);
+    printf("committer %s %s\n", commit->user, commit->date);
+    if(!stringIsEmpty(&commit->revision->comment))
     {
-        printf("data %d\n%s\n", stringLength(&revision->comment), revision->comment.data);
+        printf("data %d\n%s\n", stringLength(&commit->revision->comment), commit->revision->comment.data);
     }
     else
     {
         printf("data <<EOF\n/* no comment */\nEOF\n\n");
     }
-    if(start_branch)
+    if(commit->start_branch)
     {
-        printf("from refs/tags/import_initial\n");
+        printf("from %s\n", commit->start_branch);
     }
-    printf("M 644 :%d %s\n", revision->blobref, file_name.data);
+    printf("M 644 :%d %s\n", commit->revision->blobref, file_name.data);
 }
 
 void start_blob(struct RevData const* revision)

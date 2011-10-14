@@ -18,9 +18,18 @@ struct RevData
     int blobref;
 };
 
+struct CommitData
+{
+    struct RevData* revision;
+    struct DynString* title;
+    const char* start_branch;
+    const char* date;
+    const char* user;
+};
+
 void start_blob(struct RevData const* revision);
 void stop_blob(struct RevData const* revision);
-void commit_rev(struct RevData const* revision, struct DynString const* title, bool start_branch);
+void commit_rev(struct CommitData const* details);
 
 #ifdef __cplusplus
 }
