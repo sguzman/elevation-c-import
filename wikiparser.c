@@ -95,7 +95,7 @@ static void wikiHandleStopElement(struct ParserState* state)
             struct CommitData const commit = {
                 &state->revision,
                 &state->pageTitle,
-                NULL,
+                false,
                 "01 Apr 12:23:42 2000",
                 "Jon Doe <jon.doe@example.com>"
             };

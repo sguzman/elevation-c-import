@@ -102,9 +102,21 @@ void commit_rev(struct CommitData const* commit)
     }
     if(commit->start_branch)
     {
-        printf("from %s\n", commit->start_branch);
+        printf("from refs/heads/meta\n");
     }
     printf("M 644 :%d %s\n", commit->revision->blobref, file_name.data);
+}
+
+void commit_site_info(struct SiteinfoData const* site)
+{
+    printf("commit refs/heads/meta\n");
+    printf("committer %s %s\n", site->user, site->date);
+    printf("data <<EOF\nInitial meta data\nEOF\n\n"
+           "M 644 inline meta/siteinfo.txt\n"
+           "data <<EOF_65a495a\n"
+           "%s\n"
+           "%s\n\n"
+           "EOF_65a495a\n\n", site->name->data, site->base->data);
 }
 
 void start_blob(struct RevData const* revision)

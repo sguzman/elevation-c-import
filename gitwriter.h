@@ -24,14 +24,24 @@ struct CommitData
 {
     struct RevData const* revision;
     struct DynString const* title;
-    const char* start_branch;
+    bool start_branch;
     const char* date;
     const char* user;
+};
+
+struct SiteinfoData
+{
+    struct DynString const* name;
+    struct DynString const* base;
+    const char* date;
+    const char* user;
+    mark_type* blobref;
 };
 
 void start_blob(struct RevData const* revision);
 void stop_blob(struct RevData const* revision);
 void commit_rev(struct CommitData const* details);
+void commit_site_info(struct SiteinfoData const* site);
 
 #ifdef __cplusplus
 }
