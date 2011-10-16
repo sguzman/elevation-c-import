@@ -103,6 +103,18 @@ static void wikiHandleStopElement(struct ParserState* state)
         }
         break;
 
+        case actCleanSite:
+        {
+            struct SiteinfoData const site = {
+                &state->siteName,
+                &state->siteBase,
+                "01 Apr 12:23:42 2000",
+                "Jon Doe <jon.doe@example.com>"
+            };
+            commit_site_info(&site);
+        }
+        break;
+
         default:
         break;
     }
