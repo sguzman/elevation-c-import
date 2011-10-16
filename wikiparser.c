@@ -33,7 +33,7 @@ struct ParserState
     struct DynString siteBase;
     struct DynString pageTitle;
     struct RevData revision;
-    bool start_new_page;
+    int  page_revisions;
 };
 
 #define TARGET(name) (offsetof(struct ParserState, name))
@@ -56,8 +56,10 @@ static void wikiHandleStartElement(struct ParserState* state)
         break;
 
         case actCleanPage:
+            printf("progress Imported %d revisions for %s\n",
+                   state->page_revisions, state->pageTitle.data);
             clearString(&state->pageTitle);
-            state->start_new_page = true;
+            state->page_revisions = 0;
         break;
 
         case actCleanRev:
@@ -97,12 +99,12 @@ static void wikiHandleStopElement(struct ParserState* state)
             struct CommitData const commit = {
                 &state->revision,
                 &state->pageTitle,
-                state->start_new_page,
+                0 == state->page_revisions,
                 "01 Apr 12:23:42 2000",
                 "Jon Doe <jon.doe@example.com>"
             };
             commit_rev(&commit);
-            state->start_new_page = false;
+            state->page_revisions++;
         }
         break;
 
