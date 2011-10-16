@@ -9,13 +9,15 @@
 extern "C"{
 #endif
 
+typedef int mark_type;
+
 struct RevData
 {
     struct DynString time;
     struct DynString comment;
     struct DynString ip;
     struct DynString user;
-    int blobref;
+    mark_type blobref;
 };
 
 struct CommitData
