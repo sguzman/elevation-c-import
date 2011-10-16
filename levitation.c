@@ -15,11 +15,39 @@ struct ProgramOptions
 
 static const char* default_committer = "Jon Doe <jd@example.com>";
 
+struct WriteModeTable
+{
+    const char* name;
+    enum OutputMode mode;
+};
+
+static const struct WriteModeTable modes[] =
+{
+    {"meta", omWriteMeta},
+    {"pages", omWritePages},
+    {"both", omWritePages | omWriteMeta},
+    {NULL, 0},
+};
+
+static enum OutputMode parse_mode(const char* mode)
+{
+    struct WriteModeTable const* mode_inspect = modes;
+    for(mode_inspect = modes; mode_inspect->name; mode_inspect++)
+    {
+        if(!strcmp(mode, mode_inspect->name))
+        {
+            return mode_inspect->mode;
+        }
+    }
+    return omWriteMeta | omWritePages;
+}
+
 static void extract_options(struct ProgramOptions* dest, int argc, char**argv)
 {
     const struct option options[] = {
         {"help", no_argument, NULL, 'h'},
         {"output", required_argument, NULL, 'o'},
+        {"mode", required_argument, NULL, 'm'},
         {"name", required_argument, NULL, 'n'},
         {"date", required_argument, NULL, 'd'},
         {0, 0, 0, 0},
@@ -49,6 +77,10 @@ static void extract_options(struct ProgramOptions* dest, int argc, char**argv)
 
             case 'o':
                 dest->output_filename = optarg;
+            break;
+
+            case 'm':
+                dest->wiki.mode = parse_mode(optarg);
             break;
 
             case 'n':
@@ -86,6 +118,15 @@ static void display_help(char const* myself)
            "  -n, --name=NAME         Use NAME as the committer information.\n"
            "                          NAME must be in the format 'name <em@il>'\n"
            "                          Defaults to %s\n"
+           "                          \n"
+           "  -m, --mode=MODE         Set the output mode to MODE. Valid\n"
+           "                          parameters are:\n"
+           "                          \n"
+           "                          meta:  stop after the wiki meta data\n"
+           "                          pages: write only the pages withot meta\n"
+           "                          both:  write both meta+pages.\n"
+           "                          \n"
+           "                          Default is both.\n"
            "                          \n"
            "  -d, --date=DATE         Use DATE as commit date. DATE must be in\n"
            "                          the '01 Apr 12:23:42 2000' format.\n"
