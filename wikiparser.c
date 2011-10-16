@@ -120,6 +120,7 @@ static void wikiHandleStopElement(struct ParserState* state)
         break;
 
         case actCleanSite:
+        if(state->mode & omWriteMeta)
         {
             struct SiteinfoData const site = {
                 &state->siteName,
@@ -128,6 +129,12 @@ static void wikiHandleStopElement(struct ParserState* state)
                 state->committer
             };
             commit_site_info(state->out, &site);
+        }
+        if(!(state->mode & omWritePages))
+        {
+            /* Since there are no pages to be written, there is no sense to
+             * further process the input XML file.*/
+            exit(0);
         }
         break;
 

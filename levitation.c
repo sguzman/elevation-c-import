@@ -30,6 +30,7 @@ static void extract_options(struct ProgramOptions* dest, int argc, char**argv)
     dest->wiki.committer = default_committer;
     dest->wiki.date = "01 Apr 12:23:42 2000";
     dest->wiki.output = stdout;
+    dest->wiki.mode = omWriteMeta | omWritePages;
     dest->ok = true;
     while(1)
     {
