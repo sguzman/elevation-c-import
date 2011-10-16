@@ -144,7 +144,6 @@ static void wikiGetText(void* context, const xmlChar* content, int len)
     {
         struct DynString* const string = context + tags[state->tag].actionParameter;
         appendString(string, (const char*)content, len);
-        printf("progress %s\n", string->data);
     }
     else if(actBlob == action)
     {
