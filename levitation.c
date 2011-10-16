@@ -1,8 +1,6 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <libxml/parser.h>
-
 #include "wikiparser.h"
 
 struct ProgramOptions
