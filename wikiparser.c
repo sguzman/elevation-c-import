@@ -39,6 +39,7 @@ struct ParserState
     char const* committer;
     char const* date;
     FILE* out;
+    enum OutputMode mode;
 };
 
 #define TARGET(name) (offsetof(struct ParserState, name))
@@ -191,6 +192,7 @@ void initWikiParser(xmlSAXHandler* target, struct ParserState* state,
     state->committer = wpi->committer;
     state->date = wpi->date;
     state->out = wpi->output;
+    state->mode = wpi->mode;
 }
 
 int parseWiki(struct WikiParserInfo const* wpi)
