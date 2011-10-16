@@ -179,7 +179,7 @@ static void wikiGetText(void* context, const xmlChar* content, int len)
 }
 
 void initWikiParser(xmlSAXHandler* target, struct ParserState* state,
-                    const char* committer, const char* date, FILE* out)
+                    struct WikiParserInfo const* wpi)
 {
     memset(target, 0, sizeof(*target));
     target->startElement = wikiStartElement;
@@ -188,17 +188,16 @@ void initWikiParser(xmlSAXHandler* target, struct ParserState* state,
 
     memset(state, 0, sizeof(*state));
     state->tag = ctNone;
-    state->committer = committer;
-    state->date = date;
-    state->out = out;
+    state->committer = wpi->committer;
+    state->date = wpi->date;
+    state->out = wpi->output;
 }
 
-int parseWiki(const char* file, FILE* out, const char* committer,
-              const char* date)
+int parseWiki(struct WikiParserInfo const* wpi)
 {
     xmlDefaultSAXHandlerInit();
     xmlSAXHandler handler;
     struct ParserState state;
-    initWikiParser(&handler, &state, committer, date, out);
-    return xmlSAXUserParseFile(&handler, &state, file);
+    initWikiParser(&handler, &state, wpi);
+    return xmlSAXUserParseFile(&handler, &state, wpi->input_file);
 }
