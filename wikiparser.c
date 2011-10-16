@@ -60,8 +60,11 @@ static void wikiHandleStartElement(struct ParserState* state)
         break;
 
         case actCleanPage:
-            printf("progress Imported %d revisions for %s\n",
-                   state->page_revisions, state->pageTitle.data);
+            if(!stringIsEmpty(&state->pageTitle))
+            {
+                printf("progress Overall revision count: %10d, Imported %5d revisions for %s\n",
+                       state->revision.blobref, state->page_revisions, state->pageTitle.data);
+            }
             clearString(&state->pageTitle);
             state->page_revisions = 0;
         break;
