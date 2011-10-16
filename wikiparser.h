@@ -5,9 +5,7 @@
 extern "C"{
 #endif
 
-#include <libxml/SAX2.h>
-
-int parseWiki(const char* file);
+int parseWiki(const char* file, const char* committer, const char* date);
 
 #ifdef __cplusplus
 }

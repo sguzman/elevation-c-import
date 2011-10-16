@@ -1,6 +1,8 @@
 #include "wikiparser.h"
 #include <string.h>
 #include <stddef.h>
+#include <libxml/SAX2.h>
+
 
 #include "dynstring.h"
 #include "gitwriter.h"
@@ -34,6 +36,8 @@ struct ParserState
     struct DynString pageTitle;
     struct RevData revision;
     int  page_revisions;
+    char const* committer;
+    char const* date;
 };
 
 #define TARGET(name) (offsetof(struct ParserState, name))
@@ -100,8 +104,8 @@ static void wikiHandleStopElement(struct ParserState* state)
                 &state->revision,
                 &state->pageTitle,
                 0 == state->page_revisions,
-                "01 Apr 12:23:42 2000",
-                "Jon Doe <jon.doe@example.com>"
+                state->date,
+                state->committer
             };
             commit_rev(&commit);
             state->page_revisions++;
@@ -113,8 +117,8 @@ static void wikiHandleStopElement(struct ParserState* state)
             struct SiteinfoData const site = {
                 &state->siteName,
                 &state->siteBase,
-                "01 Apr 12:23:42 2000",
-                "Jon Doe <jon.doe@example.com>"
+                state->date,
+                state->committer
             };
             commit_site_info(&site);
         }
@@ -168,7 +172,8 @@ static void wikiGetText(void* context, const xmlChar* content, int len)
     }
 }
 
-void initWikiParser(xmlSAXHandler* target, struct ParserState* state)
+void initWikiParser(xmlSAXHandler* target, struct ParserState* state,
+                    const char* committer, const char* date)
 {
     memset(target, 0, sizeof(*target));
     target->startElement = wikiStartElement;
@@ -177,13 +182,15 @@ void initWikiParser(xmlSAXHandler* target, struct ParserState* state)
 
     memset(state, 0, sizeof(*state));
     state->tag = ctNone;
+    state->committer = committer;
+    state->date = date;
 }
 
-int parseWiki(const char* file)
+int parseWiki(const char* file, const char* committer, const char* date)
 {
     xmlDefaultSAXHandlerInit();
     xmlSAXHandler handler;
     struct ParserState state;
-    initWikiParser(&handler, &state);
+    initWikiParser(&handler, &state, committer, date);
     return xmlSAXUserParseFile(&handler, &state, file);
 }
