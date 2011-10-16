@@ -146,6 +146,16 @@ int main(int argc, char**argv)
         display_help(argv[0]);
         return !opts.ok;
     }
+    if(opts.output_filename)
+    {
+        opts.wiki.output = fopen(opts.output_filename, "wb");
+        if(!opts.wiki.output)
+        {
+            fprintf(stderr, "Can't write into file `%s'.\n",
+                    opts.output_filename);
+            return 1;
+        }
+    }
     parseWiki(&opts.wiki);
     return 0;
 }
