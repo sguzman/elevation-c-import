@@ -33,6 +33,7 @@ struct ParserState
     struct DynString siteBase;
     struct DynString pageTitle;
     struct RevData revision;
+    bool start_new_page;
 };
 
 #define TARGET(name) (offsetof(struct ParserState, name))
@@ -56,6 +57,7 @@ static void wikiHandleStartElement(struct ParserState* state)
 
         case actCleanPage:
             clearString(&state->pageTitle);
+            state->start_new_page = true;
         break;
 
         case actCleanRev:
@@ -95,11 +97,12 @@ static void wikiHandleStopElement(struct ParserState* state)
             struct CommitData const commit = {
                 &state->revision,
                 &state->pageTitle,
-                false,
+                state->start_new_page,
                 "01 Apr 12:23:42 2000",
                 "Jon Doe <jon.doe@example.com>"
             };
             commit_rev(&commit);
+            state->start_new_page = false;
         }
         break;
 
