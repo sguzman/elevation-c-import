@@ -22,8 +22,8 @@ struct RevData
 
 struct CommitData
 {
-    struct RevData* revision;
-    struct DynString* title;
+    struct RevData const* revision;
+    struct DynString const* title;
     const char* start_branch;
     const char* date;
     const char* user;
