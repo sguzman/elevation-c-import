@@ -2,6 +2,7 @@
 #define GITWRITER_H__
 
 #include <stdbool.h>
+#include <stdio.h>
 
 #include "dynstring.h"
 
@@ -38,10 +39,10 @@ struct SiteinfoData
     mark_type* blobref;
 };
 
-void start_blob(struct RevData const* revision);
-void stop_blob(struct RevData const* revision);
-void commit_rev(struct CommitData const* details);
-void commit_site_info(struct SiteinfoData const* site);
+void start_blob(FILE* out, struct RevData const* revision);
+void stop_blob(FILE* out, struct RevData const* revision);
+void commit_rev(FILE* out, struct CommitData const* details);
+void commit_site_info(FILE* out, struct SiteinfoData const* site);
 
 #ifdef __cplusplus
 }

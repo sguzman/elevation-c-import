@@ -75,43 +75,43 @@ static void wikiDateToGitDate(char* dest, const char* source)
     strncpy(dest+16, source, 4);
 }
 
-static void print_author(struct RevData const* revision, const char* date)
+static void print_author(FILE* out, struct RevData const* revision, const char* date)
 {
     if(!stringIsEmpty(&revision->user))
     {
-        printf("author %s <%s> %s\n", revision->user.data, revision->user.data, date);
+        fprintf(out, "author %s <%s> %s\n", revision->user.data, revision->user.data, date);
     }
 }
 
-void commit_rev(struct CommitData const* commit)
+void commit_rev(FILE* out, struct CommitData const* commit)
 {
     static struct DynString file_name;
     static char git_date[] = "22 Feb 05:42:23 2097";
     wikiDateToGitDate(git_date, commit->revision->time.data);
     create_filename(&file_name, commit->title);
-    printf("commit refs/heads/%s\n", file_name.data);
-    print_author(commit->revision, git_date);
-    printf("committer %s %s\n", commit->user, commit->date);
+    fprintf(out, "commit refs/heads/%s\n", file_name.data);
+    print_author(out, commit->revision, git_date);
+    fprintf(out, "committer %s %s\n", commit->user, commit->date);
     if(!stringIsEmpty(&commit->revision->comment))
     {
-        printf("data %d\n%s\n", stringLength(&commit->revision->comment), commit->revision->comment.data);
+        fprintf(out, "data %d\n%s\n", stringLength(&commit->revision->comment), commit->revision->comment.data);
     }
     else
     {
-        printf("data <<EOF\n/* no comment */\nEOF\n\n");
+        fprintf(out, "data <<EOF\n/* no comment */\nEOF\n\n");
     }
     if(commit->start_branch)
     {
-        printf("from refs/heads/meta\n");
+        fprintf(out, "from refs/heads/meta\n");
     }
-    printf("M 644 :%d %s\n", commit->revision->blobref, file_name.data);
+    fprintf(out, "M 644 :%d %s\n", commit->revision->blobref, file_name.data);
 }
 
-void commit_site_info(struct SiteinfoData const* site)
+void commit_site_info(FILE* out, struct SiteinfoData const* site)
 {
-    printf("commit refs/heads/meta\n");
-    printf("committer %s %s\n", site->user, site->date);
-    printf("data <<EOF\nInitial meta data\nEOF\n\n"
+    fprintf(out, "commit refs/heads/meta\n");
+    fprintf(out, "committer %s %s\n", site->user, site->date);
+    fprintf(out, "data <<EOF\nInitial meta data\nEOF\n\n"
            "M 644 inline meta/siteinfo.txt\n"
            "data <<EOF_65a495a\n"
            "%s\n"
@@ -119,12 +119,12 @@ void commit_site_info(struct SiteinfoData const* site)
            "EOF_65a495a\n\n", site->name->data, site->base->data);
 }
 
-void start_blob(struct RevData const* revision)
+void start_blob(FILE* out, struct RevData const* revision)
 {
-    printf("blob\nmark :%d\ndata <<EOF_%p_PAGE\n", revision->blobref, revision);
+    fprintf(out, "blob\nmark :%d\ndata <<EOF_%p_PAGE\n", revision->blobref, revision);
 }
 
-void stop_blob(struct RevData const* revision)
+void stop_blob(FILE* out, struct RevData const* revision)
 {
-    printf("\nEOF_%p_PAGE\n\n", revision);
+    fprintf(out, "\nEOF_%p_PAGE\n\n", revision);
 }

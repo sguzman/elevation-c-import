@@ -12,6 +12,7 @@ int main(int argc, char**argv)
         fprintf(stderr, "Usage: %s filename\n", argv[0]);
         return 1;
     }
-    parseWiki(argv[1], "Jon Doe <jd@example.com>", "01 Apr 12:23:42 2000");
+    parseWiki(argv[1], stdout, "Jon Doe <jd@example.com>",
+              "01 Apr 12:23:42 2000");
     return 0;
 }

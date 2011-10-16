@@ -38,6 +38,7 @@ struct ParserState
     int  page_revisions;
     char const* committer;
     char const* date;
+    FILE* out;
 };
 
 #define TARGET(name) (offsetof(struct ParserState, name))
@@ -62,8 +63,10 @@ static void wikiHandleStartElement(struct ParserState* state)
         case actCleanPage:
             if(!stringIsEmpty(&state->pageTitle))
             {
-                printf("progress Overall revision count: %10d, Imported %5d revisions for %s\n",
-                       state->revision.blobref, state->page_revisions, state->pageTitle.data);
+                fprintf(state->out, "progress Overall revision count: %10d, "
+                                    "Imported %5d revisions for %s\n",
+                       state->revision.blobref,
+                       state->page_revisions, state->pageTitle.data);
             }
             clearString(&state->pageTitle);
             state->page_revisions = 0;
@@ -78,7 +81,7 @@ static void wikiHandleStartElement(struct ParserState* state)
 
         case actBlob:
             state->revision.blobref++;
-            start_blob(&state->revision);
+            start_blob(state->out, &state->revision);
         break;
 
         case actCheckStore:
@@ -98,7 +101,7 @@ static void wikiHandleStopElement(struct ParserState* state)
     switch(tags[state->tag].action)
     {
         case actBlob:
-            stop_blob(&state->revision);
+            stop_blob(state->out, &state->revision);
         break;
 
         case actCleanRev:
@@ -110,7 +113,7 @@ static void wikiHandleStopElement(struct ParserState* state)
                 state->date,
                 state->committer
             };
-            commit_rev(&commit);
+            commit_rev(state->out, &commit);
             state->page_revisions++;
         }
         break;
@@ -123,7 +126,7 @@ static void wikiHandleStopElement(struct ParserState* state)
                 state->date,
                 state->committer
             };
-            commit_site_info(&site);
+            commit_site_info(state->out, &site);
         }
         break;
 
@@ -176,7 +179,7 @@ static void wikiGetText(void* context, const xmlChar* content, int len)
 }
 
 void initWikiParser(xmlSAXHandler* target, struct ParserState* state,
-                    const char* committer, const char* date)
+                    const char* committer, const char* date, FILE* out)
 {
     memset(target, 0, sizeof(*target));
     target->startElement = wikiStartElement;
@@ -187,13 +190,15 @@ void initWikiParser(xmlSAXHandler* target, struct ParserState* state,
     state->tag = ctNone;
     state->committer = committer;
     state->date = date;
+    state->out = out;
 }
 
-int parseWiki(const char* file, const char* committer, const char* date)
+int parseWiki(const char* file, FILE* out, const char* committer,
+              const char* date)
 {
     xmlDefaultSAXHandlerInit();
     xmlSAXHandler handler;
     struct ParserState state;
-    initWikiParser(&handler, &state, committer, date);
+    initWikiParser(&handler, &state, committer, date, out);
     return xmlSAXUserParseFile(&handler, &state, file);
 }
