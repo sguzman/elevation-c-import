@@ -182,7 +182,7 @@ static void wikiGetText(void* context, const xmlChar* content, int len)
     }
     else if(actBlob == action)
     {
-        fwrite(content, len, 1, stdout);
+        fwrite(content, len, 1, state->out);
     }
 }
 
