@@ -30,6 +30,7 @@ static void extract_options(struct ProgramOptions* dest, int argc, char**argv)
     dest->wiki.committer = default_committer;
     dest->wiki.date = "01 Apr 12:23:42 2000";
     dest->wiki.output = stdout;
+    dest->ok = true;
     while(1)
     {
         const int optval = getopt_long(argc, argv, "hi:o:m:n:d:", options,
@@ -56,13 +57,20 @@ static void extract_options(struct ProgramOptions* dest, int argc, char**argv)
             case 'd':
                 dest->wiki.date = optarg;
             break;
+
+            case '?':
+                /* getopt already printed an error message */
+            break;
+
+            default:
+                dest->ok = false;
         }
     }
     if(optind == (argc -1))
     {
         dest->wiki.input_file = argv[optind];
     }
-    dest->ok = dest->wiki.input_file || dest->help;
+    dest->ok &= dest->wiki.input_file || dest->help;
 }
 
 static void display_help(char const* myself)
