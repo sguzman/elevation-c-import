@@ -1,0 +1,4 @@
+.. _design_decisions:
+
+Design decisions of the result repository
+=========================================

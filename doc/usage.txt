@@ -32,8 +32,14 @@ temporary file before.
   c:\foo\wiki.git> del ..\tempfile.fi
 
 
+Special parameters
+------------------
+
+TO BE DONE
+
 After the conversion
 --------------------
 After ``git fast-import`` is done, the repository contains a ``meta`` branch,
 which contains some technical informations about the imported wiki, and an own
-branch for each page.
+branch for each page. See the :doc:`design page <design>` for the
+reasons.
