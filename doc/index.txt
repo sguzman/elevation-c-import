@@ -6,11 +6,17 @@
 Welcome to Levitation-2's documentation!
 ========================================
 
+Levitation-2 is a tool to import complete MediaWiki XML dumps into
+a git repository.
+
 Contents:
 
 .. toctree::
    :maxdepth: 2
 
+   usage
+   design
+   developers
 
 
 Indices and tables
