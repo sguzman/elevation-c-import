@@ -1,4 +1,63 @@
 .. _design_decisions:
 
-Design decisions of the result repository
-=========================================
+Design decisions of the repository
+==================================
+
+One branch per page
+-------------------
+
+There are different models how to put a store of independent pages with
+different revisions into a version control system like git. This is not an
+entirely new problem, since the same happened before in other version
+control system(VCS) to git converters. When other VCS are converted to git, the
+import software groups changes to different files into so called commits. A
+commit contains all changes to many files at the same time, along with other
+informations (when was the change, who did it, and why). For a VCS this makes
+sense, since they typically handle the source code of some product, and the
+change of one file can cause that other files needs to be changed too. This is
+because in a software product the different files are not independent of each
+other.
+
+In Wikipedia there is a different situation, in the way that different pages
+are independent. There are edits, which spread over different pages (like the
+moving of a text block from one page to another), but this is not the general
+use case. Most of the time edits at the same time are unrelated.
+
+Because of the independence of the different pages, I decided to give each page
+its own branch.
+
+Usage reason
+............
+
+Levitation creates one branch per wiki-page, which contains all revisions of
+this page. This means that this branch contains all revisions of this page,
+without the revisions of other pages.
+
+There are two advantages: it is easy to create a new branch for this single
+page, and merge this page back, and also it is possible to create a git clone
+for only this page, without the need to clone the entire wiki history.
+
+Technical reason
+................
+
+The different revisions in the XML file are ordered in one page tag, and are
+sorted in their chronological order, oldest revision first. This is the same
+ordering, which ``git fast-import`` expect for the commits on a branch.
+
+So it is very easy to write a program, which creates a new branch for each
+page, and place each page revision as a commit on this branch, in the same
+order how they come from the XML parser.
+
+Another model is to order different revisions with the same time stamp into one
+commit. But this would require to cache many revisions in memory, and also
+takes lots of computation power.
+
+The ``meta`` branch
+-------------------
+
+Levitation creates a ``meta`` named branch, which contains the name of the
+site, and the base URL. This branch fullfils two reasons:
+
+* It stores some meta informations about the source wiki
+* It serves as a common ancestor of all page branches, making the page branches
+  belong to a common repo
