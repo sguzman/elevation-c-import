@@ -28,7 +28,7 @@ temporary file before.
   c:\foo> levitation.exe -n "My Name <mn@example.com>" -o tempfile.fi dump.xml
   c:\foo> git init --bare wiki.git
   c:\foo> cd wiki.git
-  c:\foo\wiki.git> git fast-import < ..\tempfile.fi
+  c:\foo\wiki.git> git fast-import --date-format=rfc2822 < ..\tempfile.fi
   c:\foo\wiki.git> del ..\tempfile.fi
 
 
