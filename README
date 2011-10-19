@@ -1,0 +1,6 @@
+You find the documentation for this software under the doc/ folder.
+
+Instructions how to build levitation-2 are in doc/build.txt.
+
+Please note that the project is currently not in a production-ready state, see
+doc/todo.txt for further details.
