@@ -14,9 +14,9 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   build
    usage
    design
-   developers
 
 
 Indices and tables

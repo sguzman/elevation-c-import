@@ -1,0 +1,42 @@
+Compiling levitation-2
+======================
+
+This chapter describe how to build levitation-2 from the source code. You can
+skip this part when you got a binary distribution.
+
+Dependencies
+------------
+
+In order to build levitation-2, you need
+
+* a C compiler (tested with gcc (Debian 4.3.5-4))
+* CMake 2.8
+* libxml2 + development files
+* an implementation of getopt (contained in the mingw-gcc, should be present on
+  an UNIX-like system)
+
+Build
+-----
+
+The build of levitation-2 is straight-forward:
+
+.. code-block:: sh
+
+  tar xzf lev2.tar.gz
+  mkdir build_lev2
+  # make an out-of-source build directory
+  cd build_lev2
+  # create makefiles
+  cmake ../lev2
+  # Build the software
+  make
+  # Test if it works
+  ./levitation --help
+  
+
+Documentation
+-------------
+
+The documentation is placed in the doc/ sub folder. To create the html files,
+you need `Sphinx <http://sphinx.pocoo.org/>`_. The html files are created by
+running ``make html`` in the doc/ sub folder.
