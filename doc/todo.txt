@@ -1,0 +1,67 @@
+Things to be done
+=================
+
+This page consist of different things that need to be done.
+
+Show stoppers
+-------------
+
+There are currently the following known problems in levitation-2, which
+prohibit the use of the software in a productive environment.
+
+Stabilize committer info and date
+.................................
+
+Currently the committer information and time is taken from the command line.
+This creates the problem, that different imports of the same wiki lead to
+different histories, which are only distinct in their meta data. To address
+this problem, the committer name bust be fixed, and the commit date should be
+taken from the page revision.
+
+Embed version information
+.........................
+
+The program has no ``--version`` switch, nor is there any other way how to figure out which version a levitation binary has. The version information has to be embedded into the binary, and be retrievable by the ``--version`` switch. Also the version info should be printed by an ``progress`` command, but **MUST NOT** enter any commit meta data.
+
+The reason to not embed the version info in the meta data is that the import of the same wiki dump with different versions of levitation-2 should produce the same git repository.
+
+Check the range of :mark commands
+.................................
+
+The file content for each page is currently written with a ``:mark`` command,
+which is of type integer. The git-fastimport documentation nowhere states,
+which is the valid range of this parameter. There is a risk, that this is a
+32 bit signed integer, and can overroll with large wikis.
+
+Nice to have
+------------
+
+Statistics
+..........
+
+During the import there should be a statistic, how many revisions per second
+are imported (should go along with the line about the last imported page).
+
+After the import, following parameters should be printed:
+
+* used time
+* revision count of all pages
+* page count
+* average reisions per page
+* memory usage
+
+
+Tests
+.....
+
+Currently there is not a single software test. There should be at least a test
+to check if the created software can successfully import a sample dump file.
+
+Somebody Else's Problem(TM)
+---------------------------
+
+The following things are out of the scope of this project:
+
+* make a git frontend, which can be used by non-developers
+* create an offline editor, desirably with merge support
+* add a storage backend to the MediaWiki software to support git as "Database"

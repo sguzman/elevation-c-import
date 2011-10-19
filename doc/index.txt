@@ -18,6 +18,7 @@ Contents:
    usage
    design
    repo_usage
+   todo
 
 
 Indices and tables
