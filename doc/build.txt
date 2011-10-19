@@ -13,7 +13,7 @@ In order to build levitation-2, you need
 * CMake 2.8
 * libxml2 + development files
 * an implementation of getopt (contained in the mingw-gcc, should be present on
-  an UNIX-like system)
+  any UNIX-like system)
 
 Build
 -----
