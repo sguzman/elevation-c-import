@@ -17,6 +17,7 @@ Contents:
    build
    usage
    design
+   repo_usage
 
 
 Indices and tables

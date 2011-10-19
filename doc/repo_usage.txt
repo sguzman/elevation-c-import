@@ -1,0 +1,46 @@
+How to use the resulting git repository
+=======================================
+
+Get a list of all pages
+-----------------------
+
+Since levitation-2 creates a branch for each page, you need to ask git to
+display the branches. This is done with ``git branch``.
+
+Check out out a page
+--------------------
+
+You can check out a page by checking out the corresponding branch. To view the
+"Linux" page, you run ``git checkout Linux``. Afterwards the newest revision of
+the "Linux" page is in the current directory in a ``Linux`` called file.
+
+Get the history of a page
+-------------------------
+
+Simple run ``git log «page»`` to get the log of this page.
+
+Create a lightweight clone of a page
+------------------------------------
+
+To create a clone which consist only of a limited number of pages, you cant
+use ``git clone «URL»``, since a regular clone contains a full copy of the
+remote repo. To get local repo with some selected pages only, you need to run
+the following receipe:
+
+.. code-block:: sh
+
+  # create the repo
+  git init mywiki
+
+  # change into the repo directory
+  cd mywiki
+
+  # create a link to the source repo, and also pass
+  # the pages we are interested here
+  git remote add origin «REMOTE URL» -t«page 1» -t«page 2»
+
+  # retreive the pages
+  git fetch
+
+  # Now the local repository has the pages we are interested in,
+  # without a full clone of the remote wiki.
