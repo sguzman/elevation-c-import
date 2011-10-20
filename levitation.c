@@ -31,8 +31,6 @@ struct ProgramOptions
     struct WikiParserInfo wiki;
 };
 
-static const char* default_committer = "Jon Doe <jd@example.com>";
-
 struct WriteModeTable
 {
     const char* name;
@@ -66,21 +64,17 @@ static void extract_options(struct ProgramOptions* dest, int argc, char**argv)
         {"help", no_argument, NULL, 'h'},
         {"output", required_argument, NULL, 'o'},
         {"mode", required_argument, NULL, 'm'},
-        {"name", required_argument, NULL, 'n'},
-        {"date", required_argument, NULL, 'd'},
         {0, 0, 0, 0},
     };
     int option_index = 0;
     memset(dest, 0, sizeof(*dest));
     dest->wiki.input_file = argv[1];
-    dest->wiki.committer = default_committer;
-    dest->wiki.date = "01 Apr 12:23:42 2000";
     dest->wiki.output = stdout;
     dest->wiki.mode = omWriteMeta | omWritePages;
     dest->ok = true;
     while(1)
     {
-        const int optval = getopt_long(argc, argv, "hi:o:m:n:d:", options,
+        const int optval = getopt_long(argc, argv, "hi:o:m:", options,
                                        &option_index);
         if(optval == -1)
         {
@@ -99,14 +93,6 @@ static void extract_options(struct ProgramOptions* dest, int argc, char**argv)
 
             case 'm':
                 dest->wiki.mode = parse_mode(optarg);
-            break;
-
-            case 'n':
-                dest->wiki.committer = optarg;
-            break;
-
-            case 'd':
-                dest->wiki.date = optarg;
             break;
 
             case '?':
@@ -137,10 +123,6 @@ static void display_help(char const* myself)
            "                          You must write the content to a file if\n"
            "                          your OS changes \\n chars in the output.\n"
            "                          \n"
-           "  -n, --name=NAME         Use NAME as the committer information.\n"
-           "                          NAME must be in the format 'name <em@il>'\n"
-           "                          Defaults to %s\n"
-           "                          \n"
            "  -m, --mode=MODE         Set the output mode to MODE. Valid\n"
            "                          parameters are:\n"
            "                          \n"
@@ -149,14 +131,10 @@ static void display_help(char const* myself)
            "                          both:  write both meta+pages.\n"
            "                          \n"
            "                          Default is both.\n"
-           "                          \n"
-           "  -d, --date=DATE         Use DATE as commit date. DATE must be in\n"
-           "                          the '01 Apr 12:23:42 2000' format.\n"
-           "                          Defaults to now.\n"
            "\n"
            "The INPUT-FILE must be the last parameter on the command line, and\n"
            "is a required parameter.\n",
-           myself, default_committer);
+           myself);
 }
 
 int main(int argc, char**argv)

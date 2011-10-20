@@ -9,15 +9,6 @@ Show stoppers
 There are currently the following known problems in levitation-2, which
 prohibit the use of the software in a productive environment.
 
-Stabilize committer info and date
-.................................
-
-Currently the committer information and time is taken from the command line.
-This creates the problem, that different imports of the same wiki lead to
-different histories, which are only distinct in their meta data. To address
-this problem, the committer name bust be fixed, and the commit date should be
-taken from the page revision.
-
 Check the range of :mark commands
 .................................
 

@@ -42,16 +42,12 @@ struct CommitData
     struct RevData const* revision;
     struct DynString const* title;
     bool start_branch;
-    const char* date;
-    const char* user;
 };
 
 struct SiteinfoData
 {
     struct DynString const* name;
     struct DynString const* base;
-    const char* date;
-    const char* user;
     mark_type* blobref;
 };
 

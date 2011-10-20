@@ -52,8 +52,6 @@ struct ParserState
     struct DynString pageTitle;
     struct RevData revision;
     int  page_revisions;
-    char const* committer;
-    char const* date;
     FILE* out;
     enum OutputMode mode;
 };
@@ -127,8 +125,6 @@ static void wikiHandleStopElement(struct ParserState* state)
                 &state->revision,
                 &state->pageTitle,
                 0 == state->page_revisions,
-                state->date,
-                state->committer
             };
             commit_rev(state->out, &commit);
             state->page_revisions++;
@@ -141,8 +137,6 @@ static void wikiHandleStopElement(struct ParserState* state)
             struct SiteinfoData const site = {
                 &state->siteName,
                 &state->siteBase,
-                state->date,
-                state->committer
             };
             commit_site_info(state->out, &site);
         }
@@ -212,8 +206,6 @@ void initWikiParser(xmlSAXHandler* target, struct ParserState* state,
 
     memset(state, 0, sizeof(*state));
     state->tag = ctNone;
-    state->committer = wpi->committer;
-    state->date = wpi->date;
     state->out = wpi->output;
     state->mode = wpi->mode;
 }
