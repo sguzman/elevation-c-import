@@ -18,6 +18,8 @@
 #include <string.h>
 #include <stddef.h>
 #include <libxml/SAX2.h>
+#include <time.h>
+#include <math.h>
 
 
 #include "dynstring.h"
@@ -54,6 +56,8 @@ struct ParserState
     int  page_revisions;
     FILE* out;
     enum OutputMode mode;
+    time_t convert_start;
+    time_t page_start;
 };
 
 #define TARGET(name) (offsetof(struct ParserState, name))
@@ -76,15 +80,9 @@ static void wikiHandleStartElement(struct ParserState* state)
         break;
 
         case actCleanPage:
-            if(!stringIsEmpty(&state->pageTitle))
-            {
-                fprintf(state->out, "progress Overall revision count: %10d, "
-                                    "Imported %5d revisions for %s\n",
-                       state->revision.blobref,
-                       state->page_revisions, state->pageTitle.data);
-            }
             clearString(&state->pageTitle);
             state->page_revisions = 0;
+            state->page_start = time(NULL);
         break;
 
         case actCleanRev:
@@ -109,6 +107,16 @@ static void wikiHandleStartElement(struct ParserState* state)
         default: // ignore other actions
         break;
     }
+}
+
+static double rev_per_sec(double revisions, time_t start, time_t stop)
+{
+    const unsigned delta = stop - start;
+    if(delta)
+    {
+        return revisions/delta;
+    }
+    return INFINITY;
 }
 
 static void wikiHandleStopElement(struct ParserState* state)
@@ -148,6 +156,17 @@ static void wikiHandleStopElement(struct ParserState* state)
         }
         break;
 
+        case actCleanPage:
+        {
+            time_t const now = time(NULL);
+            fprintf(state->out, "progress Overall revisions: %10d (%2.1f rps), "
+                                "Imported %5d revisions (%2.1f rps) for %s\n",
+                   state->revision.blobref,
+                   rev_per_sec(state->revision.blobref, state->convert_start, now),
+                   state->page_revisions,
+                   rev_per_sec(state->page_revisions, state->page_start, now),
+                   state->pageTitle.data);
+        }
         default:
         break;
     }
@@ -208,6 +227,7 @@ void initWikiParser(xmlSAXHandler* target, struct ParserState* state,
     state->tag = ctNone;
     state->out = wpi->output;
     state->mode = wpi->mode;
+    state->convert_start = time(NULL);
 }
 
 int parseWiki(struct WikiParserInfo const* wpi)
