@@ -144,3 +144,8 @@ void stop_blob(FILE* out, struct RevData const* revision)
 {
     fprintf(out, "\nEOF_%p_PAGE\n\n", revision);
 }
+
+void progress(FILE* out, const char* what)
+{
+    fprintf(out, "progress %s\n", what);
+}

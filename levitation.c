@@ -20,6 +20,8 @@
 #include <stdbool.h>
 
 #include "wikiparser.h"
+#include "version.h"
+#include "gitwriter.h"
 
 struct ProgramOptions
 {
@@ -124,7 +126,11 @@ static void extract_options(struct ProgramOptions* dest, int argc, char**argv)
 
 static void display_help(char const* myself)
 {
-    printf("usage: %s [OPTION] INPUT-FILE\n"
+    printf("levitation " VERSION "\n"
+           "created at " __DATE__ " " __TIME__ "\n"
+           "                          \n"
+           "                          \n"
+           "usage: %s [OPTION] INPUT-FILE\n"
            "OPTIONS\n\n"
            "  -h, --help              Display this help and exit.\n"
            "  -o, --output=FILENAME   Write to FILENAME (default is stdout)\n"
@@ -172,6 +178,7 @@ int main(int argc, char**argv)
             return 1;
         }
     }
+    progress(opts.wiki.output, "levitation version " VERSION "(" __DATE__ " " __TIME__ ")");
     parseWiki(&opts.wiki);
     return 0;
 }
