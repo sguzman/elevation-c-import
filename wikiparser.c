@@ -35,7 +35,8 @@ enum CurrentTag{
 #undef TARGET
 #undef TAGDEF
 
-enum TagAction{actNone, actStore, actCheckStore, actBlob, actCleanSite, actCleanPage, actCleanRev};
+enum TagAction{actNone, actStore, actCheckStore, actBlob, actCleanSite,
+    actCleanPage, actCleanRev, actExit};
 
 struct TagInfo
 {
@@ -167,6 +168,27 @@ static void wikiHandleStopElement(struct ParserState* state)
                    rev_per_sec(state->page_revisions, state->page_start, now),
                    state->pageTitle.data);
         }
+        break;
+
+        case actExit:
+        {
+            /* print statistics and clean up*/
+            time_t const now = time(NULL);
+            fprintf(state->out, "progress Wrote %d pages in %ld sec (%2.1f rps)\n",
+                    state->revision.blobref,
+                    now - state->convert_start,
+                    rev_per_sec(state->revision.blobref, state->convert_start, now));
+#define PRINT_STAT(x) printStatistic(&state->x, #x, state->out)
+            PRINT_STAT(siteName);
+            PRINT_STAT(siteBase);
+            PRINT_STAT(pageTitle);
+            PRINT_STAT(revision.time);
+            PRINT_STAT(revision.comment);
+            PRINT_STAT(revision.ip);
+            PRINT_STAT(revision.user);
+        }
+        break;
+
         default:
         break;
     }

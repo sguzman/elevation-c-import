@@ -50,6 +50,8 @@ void setStringMinCapacity(struct DynString* string, int size)
             exit(1);
         }
         string->size = size;
+        string->allocations++;
+        string->max_length = size;
     }
 }
 
@@ -61,4 +63,10 @@ void clearString(struct DynString* string)
 void freeString(struct DynString* string)
 {
     free(string->data);
+}
+
+void printStatistic(struct DynString const* string, const char* label, FILE* out)
+{
+    fprintf(out, "progress %s: Allocs: %d, size=%d, used=%d\n", label,
+            string->allocations, string->size, string->max_length);
 }
