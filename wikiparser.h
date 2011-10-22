@@ -27,6 +27,7 @@ struct WikiParserInfo
 {
     char const* input_file;
     const char* output_name;
+    int max_revs;
 };
 
 int parseWiki(struct WikiParserInfo const* wpi);
