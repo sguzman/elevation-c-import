@@ -53,12 +53,12 @@ void outfile_advance(struct OutFile* file)
 {
     if(file->name_template)
     {
+        generate_filename(file);
+        gen_fifo(file);
         if(file->out)
         {
             fclose(file->out);
         }
-        generate_filename(file);
-        gen_fifo(file);
         file->out = fopen(file->filename_cache.data, "wb");
         if(!file->out)
         {
