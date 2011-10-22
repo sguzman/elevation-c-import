@@ -144,7 +144,6 @@ int main(int argc, char**argv)
         display_help(argv[0]);
         return !opts.ok;
     }
-    //progress(opts.wiki.output, "levitation version " VERSION "(" __DATE__ " " __TIME__ ")");
     parseWiki(&opts.wiki);
     return 0;
 }

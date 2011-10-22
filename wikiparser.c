@@ -24,6 +24,7 @@
 
 #include "dynstring.h"
 #include "gitwriter.h"
+#include "version.h"
 
 #define TAGDEF(name, _a, _b, _act, _aparam) name,
 #define TARGET(_name)
@@ -272,5 +273,6 @@ int parseWiki(struct WikiParserInfo const* wpi)
     xmlSAXHandler handler;
     struct ParserState state;
     initWikiParser(&handler, &state, wpi);
+    progress(state.out, "levitation version " VERSION "(" __DATE__ " " __TIME__ ")");
     return xmlSAXUserParseFile(&handler, &state, wpi->input_file);
 }
