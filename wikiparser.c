@@ -155,6 +155,7 @@ static void wikiHandleStopElement(struct ParserState* state)
             };
             commit_rev(state->file.out, &commit);
             state->page_revisions++;
+            state->current_revisions++;
         }
         break;
 
