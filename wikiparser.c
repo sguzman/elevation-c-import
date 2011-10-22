@@ -55,7 +55,12 @@ struct ParserState
     struct DynString siteBase;
     struct DynString pageTitle;
     struct RevData revision;
+    /** Total number of revisions. */
     int  page_revisions;
+    /** Maximum number of revisions which should go in one file. */
+    int close_revisions;
+    /** Number of revisions int he current file. */
+    int current_revisions;
     const char* output_name;
     FILE* out;
     time_t convert_start;
@@ -87,6 +92,8 @@ static void reopen_output(struct ParserState* state)
                     state->output_name);
             exit(1);
         }
+        progress(state->out, "Reopened output");
+        state->current_revisions = 0;
     }
     else
     {
@@ -107,6 +114,11 @@ static void wikiHandleStartElement(struct ParserState* state)
             clearString(&state->pageTitle);
             state->page_revisions = 0;
             state->page_start = time(NULL);
+            if(state->close_revisions &&
+               (state->current_revisions >= state->close_revisions))
+            {
+                reopen_output(state);
+            }
         break;
 
         case actCleanRev:
@@ -170,6 +182,10 @@ static void wikiHandleStopElement(struct ParserState* state)
                 &state->siteBase,
             };
             commit_site_info(state->out, &site);
+            if(state->close_revisions)
+            {
+                reopen_output(state);
+            }
         }
         break;
 
@@ -265,6 +281,7 @@ void initWikiParser(xmlSAXHandler* target, struct ParserState* state,
     state->tag = ctNone;
     state->convert_start = time(NULL);
     state->output_name = wpi->output_name;
+    state->close_revisions = wpi->max_revs;
     reopen_output(state);
 }
 
