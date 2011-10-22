@@ -55,6 +55,7 @@ struct ParserState
     struct DynString pageTitle;
     struct RevData revision;
     int  page_revisions;
+    const char* output_name;
     FILE* out;
     enum OutputMode mode;
     time_t convert_start;
@@ -70,6 +71,18 @@ static struct TagInfo const tags[] ={
 #undef TAGDEF
 
 #define ARRAY_SIZE(array) (sizeof(array)/sizeof(*array))
+
+static void reopen_output(struct ParserState* state)
+{
+    if(state->output_name)
+    {
+        state->out = stdout;
+    }
+    else
+    {
+        state->out = stdout;
+    }
+}
 
 static void wikiHandleStartElement(struct ParserState* state)
 {
@@ -247,9 +260,10 @@ void initWikiParser(xmlSAXHandler* target, struct ParserState* state,
 
     memset(state, 0, sizeof(*state));
     state->tag = ctNone;
-    state->out = wpi->output;
     state->mode = wpi->mode;
     state->convert_start = time(NULL);
+    state->output_name = wpi->output_name;
+    reopen_output(state);
 }
 
 int parseWiki(struct WikiParserInfo const* wpi)

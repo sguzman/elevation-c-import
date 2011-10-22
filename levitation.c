@@ -27,7 +27,6 @@ struct ProgramOptions
 {
     bool help;
     bool ok;
-    const char* output_filename;
     struct WikiParserInfo wiki;
 };
 
@@ -69,7 +68,6 @@ static void extract_options(struct ProgramOptions* dest, int argc, char**argv)
     int option_index = 0;
     memset(dest, 0, sizeof(*dest));
     dest->wiki.input_file = argv[1];
-    dest->wiki.output = stdout;
     dest->wiki.mode = omWriteMeta | omWritePages;
     dest->ok = true;
     while(1)
@@ -88,7 +86,7 @@ static void extract_options(struct ProgramOptions* dest, int argc, char**argv)
             break;
 
             case 'o':
-                dest->output_filename = optarg;
+                dest->wiki.output_name = optarg;
             break;
 
             case 'm':
@@ -146,17 +144,7 @@ int main(int argc, char**argv)
         display_help(argv[0]);
         return !opts.ok;
     }
-    if(opts.output_filename)
-    {
-        opts.wiki.output = fopen(opts.output_filename, "wb");
-        if(!opts.wiki.output)
-        {
-            fprintf(stderr, "Can't write into file `%s'.\n",
-                    opts.output_filename);
-            return 1;
-        }
-    }
-    progress(opts.wiki.output, "levitation version " VERSION "(" __DATE__ " " __TIME__ ")");
+    //progress(opts.wiki.output, "levitation version " VERSION "(" __DATE__ " " __TIME__ ")");
     parseWiki(&opts.wiki);
     return 0;
 }
