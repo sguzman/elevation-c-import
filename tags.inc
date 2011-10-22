@@ -1,4 +1,4 @@
-TAGDEF(ctMw, "mediawiki", ctNone, 0, 0)
+TAGDEF(ctMw, "mediawiki", ctNone, actExit, 0)
 TAGDEF(  ctSiteInfo, "siteinfo", ctMw, actCleanSite, 0)
 TAGDEF(    ctSiteName, "sitename", ctSiteInfo, actStore, TARGET(siteName))
 TAGDEF(    ctBase, "base", ctSiteInfo, actStore, TARGET(siteBase))

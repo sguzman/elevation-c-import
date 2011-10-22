@@ -18,6 +18,7 @@
 #define DYNSTRING_H__
 
 #include <stdbool.h>
+#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C"{
@@ -28,6 +29,8 @@ struct DynString
     char* data;
     int length;
     int size;
+    int allocations;
+    int max_length;
 };
 
 void appendString(struct DynString* string, const char* input, int length);
@@ -36,6 +39,8 @@ int stringLength(struct DynString const* string);
 void setStringMinCapacity(struct DynString* string, int new_size);
 void clearString(struct DynString* string);
 void freeString(struct DynString* string);
+
+void printStatistic(struct DynString const* string, const char* label, FILE* out);
 
 #ifdef __cplusplus
 }

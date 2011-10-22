@@ -42,16 +42,12 @@ struct CommitData
     struct RevData const* revision;
     struct DynString const* title;
     bool start_branch;
-    const char* date;
-    const char* user;
 };
 
 struct SiteinfoData
 {
     struct DynString const* name;
     struct DynString const* base;
-    const char* date;
-    const char* user;
     mark_type* blobref;
 };
 
@@ -59,6 +55,7 @@ void start_blob(FILE* out, struct RevData const* revision);
 void stop_blob(FILE* out, struct RevData const* revision);
 void commit_rev(FILE* out, struct CommitData const* details);
 void commit_site_info(FILE* out, struct SiteinfoData const* site);
+void progress(FILE* out, const char* what);
 
 #ifdef __cplusplus
 }

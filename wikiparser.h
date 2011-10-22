@@ -28,8 +28,6 @@ enum OutputMode{omWriteMeta = 1, omWritePages = 2};
 struct WikiParserInfo
 {
     char const* input_file;
-    char const* committer;
-    char const* date;
     FILE* output;
     enum OutputMode mode;
 };

@@ -18,6 +18,8 @@
 #include <string.h>
 #include <stddef.h>
 #include <libxml/SAX2.h>
+#include <time.h>
+#include <math.h>
 
 
 #include "dynstring.h"
@@ -33,7 +35,8 @@ enum CurrentTag{
 #undef TARGET
 #undef TAGDEF
 
-enum TagAction{actNone, actStore, actCheckStore, actBlob, actCleanSite, actCleanPage, actCleanRev};
+enum TagAction{actNone, actStore, actCheckStore, actBlob, actCleanSite,
+    actCleanPage, actCleanRev, actExit};
 
 struct TagInfo
 {
@@ -52,10 +55,10 @@ struct ParserState
     struct DynString pageTitle;
     struct RevData revision;
     int  page_revisions;
-    char const* committer;
-    char const* date;
     FILE* out;
     enum OutputMode mode;
+    time_t convert_start;
+    time_t page_start;
 };
 
 #define TARGET(name) (offsetof(struct ParserState, name))
@@ -78,15 +81,9 @@ static void wikiHandleStartElement(struct ParserState* state)
         break;
 
         case actCleanPage:
-            if(!stringIsEmpty(&state->pageTitle))
-            {
-                fprintf(state->out, "progress Overall revision count: %10d, "
-                                    "Imported %5d revisions for %s\n",
-                       state->revision.blobref,
-                       state->page_revisions, state->pageTitle.data);
-            }
             clearString(&state->pageTitle);
             state->page_revisions = 0;
+            state->page_start = time(NULL);
         break;
 
         case actCleanRev:
@@ -113,6 +110,16 @@ static void wikiHandleStartElement(struct ParserState* state)
     }
 }
 
+static double rev_per_sec(double revisions, time_t start, time_t stop)
+{
+    const unsigned delta = stop - start;
+    if(delta)
+    {
+        return revisions/delta;
+    }
+    return INFINITY;
+}
+
 static void wikiHandleStopElement(struct ParserState* state)
 {
     switch(tags[state->tag].action)
@@ -127,8 +134,6 @@ static void wikiHandleStopElement(struct ParserState* state)
                 &state->revision,
                 &state->pageTitle,
                 0 == state->page_revisions,
-                state->date,
-                state->committer
             };
             commit_rev(state->out, &commit);
             state->page_revisions++;
@@ -141,8 +146,6 @@ static void wikiHandleStopElement(struct ParserState* state)
             struct SiteinfoData const site = {
                 &state->siteName,
                 &state->siteBase,
-                state->date,
-                state->committer
             };
             commit_site_info(state->out, &site);
         }
@@ -151,6 +154,38 @@ static void wikiHandleStopElement(struct ParserState* state)
             /* Since there are no pages to be written, there is no sense to
              * further process the input XML file.*/
             exit(0);
+        }
+        break;
+
+        case actCleanPage:
+        {
+            time_t const now = time(NULL);
+            fprintf(state->out, "progress Overall revisions: %10d (%2.1f rps), "
+                                "Imported %5d revisions (%2.1f rps) for %s\n",
+                   state->revision.blobref,
+                   rev_per_sec(state->revision.blobref, state->convert_start, now),
+                   state->page_revisions,
+                   rev_per_sec(state->page_revisions, state->page_start, now),
+                   state->pageTitle.data);
+        }
+        break;
+
+        case actExit:
+        {
+            /* print statistics and clean up*/
+            time_t const now = time(NULL);
+            fprintf(state->out, "progress Wrote %d pages in %ld sec (%2.1f rps)\n",
+                    state->revision.blobref,
+                    now - state->convert_start,
+                    rev_per_sec(state->revision.blobref, state->convert_start, now));
+#define PRINT_STAT(x) printStatistic(&state->x, #x, state->out)
+            PRINT_STAT(siteName);
+            PRINT_STAT(siteBase);
+            PRINT_STAT(pageTitle);
+            PRINT_STAT(revision.time);
+            PRINT_STAT(revision.comment);
+            PRINT_STAT(revision.ip);
+            PRINT_STAT(revision.user);
         }
         break;
 
@@ -212,10 +247,9 @@ void initWikiParser(xmlSAXHandler* target, struct ParserState* state,
 
     memset(state, 0, sizeof(*state));
     state->tag = ctNone;
-    state->committer = wpi->committer;
-    state->date = wpi->date;
     state->out = wpi->output;
     state->mode = wpi->mode;
+    state->convert_start = time(NULL);
 }
 
 int parseWiki(struct WikiParserInfo const* wpi)
