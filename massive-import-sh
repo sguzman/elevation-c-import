@@ -1,0 +1,22 @@
+#!/bin/bash
+
+set -ex
+
+FIFO=$1
+GIT_BASE=$2
+
+# preparation
+test -p $FIFO || mkfifo $FIFO
+mkdir -p $GIT_BASE
+CURRENT=0
+
+# create the root repo
+git init --bare ${GIT_BASE}/base.git
+GIT_DIR=${GIT_BASE}/base.git git fast-import --date-format=rfc2822 < $FIFO
+
+# create the import repos
+while CURRENT=$(($CURRENT+1))
+do
+    git clone --mirror ${GIT_BASE}/base.git  ${GIT_BASE}/$CURRENT.git
+    GIT_DIR=${GIT_BASE}/$CURRENT.git git fast-import --date-format=rfc2822 < $FIFO
+done
