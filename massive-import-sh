@@ -2,21 +2,33 @@
 
 set -ex
 
+function import(){
+    local GB=$1
+    local FE=$2
+    local NUM=$3
+    local SR=$4
+
+    local IMPORT_FILE=`printf $FE $NUM`
+
+    cat $IMPORT_FILE | GIT_DIR=$GB/$SR git fast-import --date-format=rfc2822
+}
+
 FIFO=$1
 GIT_BASE=$2
 
 # preparation
-test -p $FIFO || mkfifo $FIFO
 mkdir -p $GIT_BASE
 CURRENT=0
 
 # create the root repo
 git init --bare ${GIT_BASE}/base.git
-GIT_DIR=${GIT_BASE}/base.git git fast-import --date-format=rfc2822 < $FIFO
+import $GIT_BASE $FIFO $CURRENT base.git
 
 # create the import repos
-while CURRENT=$(($CURRENT+1))
+while CURRENT=$(($CURRENT+1)) && test -e `printf $FIFO $CURRENT`
 do
+    # break if there is no new file/link to import.
+
     git clone --mirror ${GIT_BASE}/base.git  ${GIT_BASE}/$CURRENT.git
-    GIT_DIR=${GIT_BASE}/$CURRENT.git git fast-import --date-format=rfc2822 < $FIFO
+    import $GIT_BASE $FIFO $CURRENT ${CURRENT}.git
 done
