@@ -20,6 +20,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#include "dynstring.h"
+
 #ifdef __cplusplus
 extern "C"{
 #endif
@@ -29,6 +31,9 @@ struct OutFile
     FILE* out;
     const char* name_template;
     int name_template_length;
+
+    int current_id;
+    struct DynString filename_cache;
 };
 
 void outfile_advance(struct OutFile* file);
