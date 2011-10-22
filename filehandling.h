@@ -31,6 +31,7 @@ struct OutFile
     FILE* out;
     const char* name_template;
     int name_template_length;
+    bool make_fifo;
 
     int current_id;
     struct DynString filename_cache;
