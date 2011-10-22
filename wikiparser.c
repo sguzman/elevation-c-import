@@ -77,7 +77,17 @@ static void reopen_output(struct ParserState* state)
 {
     if(state->output_name)
     {
-        state->out = stdout;
+        if(state->out)
+        {
+            fclose(state->out);
+        }
+        state->out = fopen(state->output_name, "wb");
+        if(!state->out)
+        {
+            fprintf(stderr, "Can't open file «%s» for writing.",
+                    state->output_name);
+            exit(1);
+        }
     }
     else
     {
