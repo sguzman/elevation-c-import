@@ -49,6 +49,7 @@ static void extract_options(struct ProgramOptions* dest, int argc, char**argv)
         {"help", no_argument, NULL, 'h'},
         {"output", required_argument, NULL, 'o'},
         {"maxrevs", required_argument, NULL, 'm'},
+        {"pipes", no_argument, NULL, 'p'},
         {0, 0, 0, 0},
     };
     int option_index = 0;
@@ -57,7 +58,7 @@ static void extract_options(struct ProgramOptions* dest, int argc, char**argv)
     dest->ok = true;
     while(1)
     {
-        const int optval = getopt_long(argc, argv, "hi:o:m:", options,
+        const int optval = getopt_long(argc, argv, "hi:o:m:p", options,
                                        &option_index);
         if(optval == -1)
         {
@@ -76,6 +77,10 @@ static void extract_options(struct ProgramOptions* dest, int argc, char**argv)
 
             case 'm':
                 dest->wiki.max_revs = int_to_string(optarg);
+            break;
+
+            case 'p':
+                dest->wiki.make_fifo = true;
             break;
 
             case '?':
@@ -114,6 +119,8 @@ static void display_help(char const* myself)
            "                          and the output file should be a named\n"
            "                          pipe. Good values are between about\n"
            "                          100'000 < NUM < 1'000'000\n"
+           "                          \n"
+           " -p, --pipes              Create named pipes instead of files.\n"
            "                          \n"
            "\n"
            "The INPUT-FILE must be the last parameter on the command line, and\n"

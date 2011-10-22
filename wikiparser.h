@@ -18,6 +18,7 @@
 #define WIKIPARSER_H__
 
 #include <stdio.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C"{
@@ -27,6 +28,7 @@ struct WikiParserInfo
 {
     char const* input_file;
     const char* output_name;
+    bool make_fifo;
     int max_revs;
 };
 

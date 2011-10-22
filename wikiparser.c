@@ -265,6 +265,7 @@ void initWikiParser(xmlSAXHandler* target, struct ParserState* state,
     state->tag = ctNone;
     state->convert_start = time(NULL);
     state->file.name_template = wpi->output_name;
+    state->file.make_fifo = wpi->make_fifo;
     state->close_revisions = wpi->max_revs;
     reopen_output(state);
 }
