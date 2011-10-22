@@ -14,25 +14,30 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-#ifndef WIKIPARSER_H__
-#define WIKIPARSER_H__
+#ifndef FILEHANDLING_H__
+#define FILEHANDLING_H__
 
 #include <stdio.h>
 #include <stdbool.h>
+
+#include "dynstring.h"
 
 #ifdef __cplusplus
 extern "C"{
 #endif
 
-struct WikiParserInfo
+struct OutFile
 {
-    char const* input_file;
-    const char* output_name;
+    FILE* out;
+    const char* name_template;
+    int name_template_length;
     bool make_fifo;
-    int max_revs;
+
+    int current_id;
+    struct DynString filename_cache;
 };
 
-int parseWiki(struct WikiParserInfo const* wpi);
+void outfile_advance(struct OutFile* file);
 
 #ifdef __cplusplus
 }
