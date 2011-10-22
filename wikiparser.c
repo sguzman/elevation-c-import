@@ -58,7 +58,6 @@ struct ParserState
     int  page_revisions;
     const char* output_name;
     FILE* out;
-    enum OutputMode mode;
     time_t convert_start;
     time_t page_start;
 };
@@ -165,19 +164,12 @@ static void wikiHandleStopElement(struct ParserState* state)
         break;
 
         case actCleanSite:
-        if(state->mode & omWriteMeta)
         {
             struct SiteinfoData const site = {
                 &state->siteName,
                 &state->siteBase,
             };
             commit_site_info(state->out, &site);
-        }
-        if(!(state->mode & omWritePages))
-        {
-            /* Since there are no pages to be written, there is no sense to
-             * further process the input XML file.*/
-            exit(0);
         }
         break;
 
@@ -271,7 +263,6 @@ void initWikiParser(xmlSAXHandler* target, struct ParserState* state,
 
     memset(state, 0, sizeof(*state));
     state->tag = ctNone;
-    state->mode = wpi->mode;
     state->convert_start = time(NULL);
     state->output_name = wpi->output_name;
     reopen_output(state);

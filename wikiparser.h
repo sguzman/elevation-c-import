@@ -23,13 +23,10 @@
 extern "C"{
 #endif
 
-enum OutputMode{omWriteMeta = 1, omWritePages = 2};
-
 struct WikiParserInfo
 {
     char const* input_file;
     const char* output_name;
-    enum OutputMode mode;
 };
 
 int parseWiki(struct WikiParserInfo const* wpi);

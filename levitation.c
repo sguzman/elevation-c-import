@@ -30,49 +30,20 @@ struct ProgramOptions
     struct WikiParserInfo wiki;
 };
 
-struct WriteModeTable
-{
-    const char* name;
-    enum OutputMode mode;
-};
-
-static const struct WriteModeTable modes[] =
-{
-    {"meta", omWriteMeta},
-    {"pages", omWritePages},
-    {"both", omWritePages | omWriteMeta},
-    {NULL, 0},
-};
-
-static enum OutputMode parse_mode(const char* mode)
-{
-    struct WriteModeTable const* mode_inspect = modes;
-    for(mode_inspect = modes; mode_inspect->name; mode_inspect++)
-    {
-        if(!strcmp(mode, mode_inspect->name))
-        {
-            return mode_inspect->mode;
-        }
-    }
-    return omWriteMeta | omWritePages;
-}
-
 static void extract_options(struct ProgramOptions* dest, int argc, char**argv)
 {
     const struct option options[] = {
         {"help", no_argument, NULL, 'h'},
         {"output", required_argument, NULL, 'o'},
-        {"mode", required_argument, NULL, 'm'},
         {0, 0, 0, 0},
     };
     int option_index = 0;
     memset(dest, 0, sizeof(*dest));
     dest->wiki.input_file = argv[1];
-    dest->wiki.mode = omWriteMeta | omWritePages;
     dest->ok = true;
     while(1)
     {
-        const int optval = getopt_long(argc, argv, "hi:o:m:", options,
+        const int optval = getopt_long(argc, argv, "hi:o:", options,
                                        &option_index);
         if(optval == -1)
         {
@@ -87,10 +58,6 @@ static void extract_options(struct ProgramOptions* dest, int argc, char**argv)
 
             case 'o':
                 dest->wiki.output_name = optarg;
-            break;
-
-            case 'm':
-                dest->wiki.mode = parse_mode(optarg);
             break;
 
             case '?':
@@ -121,14 +88,6 @@ static void display_help(char const* myself)
            "                          You must write the content to a file if\n"
            "                          your OS changes \\n chars in the output.\n"
            "                          \n"
-           "  -m, --mode=MODE         Set the output mode to MODE. Valid\n"
-           "                          parameters are:\n"
-           "                          \n"
-           "                          meta:  stop after the wiki meta data\n"
-           "                          pages: write only the pages withot meta\n"
-           "                          both:  write both meta+pages.\n"
-           "                          \n"
-           "                          Default is both.\n"
            "\n"
            "The INPUT-FILE must be the last parameter on the command line, and\n"
            "is a required parameter.\n",
