@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 #include <assert.h>
 
 static int rewrite_filename_chars(char* dest, const char* source)
@@ -145,7 +146,12 @@ void stop_blob(FILE* out, struct RevData const* revision)
     fprintf(out, "\nEOF_%p_PAGE\n\n", revision);
 }
 
-void progress(FILE* out, const char* what)
+void progress(FILE* out, const char* what, ...)
 {
-    fprintf(out, "progress %s\n", what);
+    va_list params;
+    fprintf(out, "progress ");
+    va_start(params, what);
+    vfprintf(out, what, params);
+    va_end(params);
+    fprintf(out, "\n");
 }

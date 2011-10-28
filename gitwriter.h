@@ -55,7 +55,8 @@ void start_blob(FILE* out, struct RevData const* revision);
 void stop_blob(FILE* out, struct RevData const* revision);
 void commit_rev(FILE* out, struct CommitData const* details);
 void commit_site_info(FILE* out, struct SiteinfoData const* site);
-void progress(FILE* out, const char* what);
+void progress(FILE* out, const char* what, ...) __attribute__ ((format (printf, 2, 3)));
+
 
 #ifdef __cplusplus
 }
