@@ -176,7 +176,7 @@ static void wikiHandleStopElement(struct ParserState* state)
         case actCleanPage:
         {
             time_t const now = time(NULL);
-            fprintf(state->file.out, "progress Overall revisions: %10d (%2.1f rps), "
+            progress(state->file.out, "Overall revisions: %10d (%2.1f rps), "
                                 "Imported %5d revisions (%2.1f rps) for %s\n",
                    state->revision.blobref,
                    rev_per_sec(state->revision.blobref, state->convert_start, now),
@@ -190,7 +190,7 @@ static void wikiHandleStopElement(struct ParserState* state)
         {
             /* print statistics and clean up*/
             time_t const now = time(NULL);
-            fprintf(state->file.out, "progress Wrote %d pages in %ld sec (%2.1f rps)\n",
+            progress(state->file.out, "Wrote %d pages in %ld sec (%2.1f rps)\n",
                     state->revision.blobref,
                     now - state->convert_start,
                     rev_per_sec(state->revision.blobref, state->convert_start, now));
