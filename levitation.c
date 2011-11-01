@@ -31,18 +31,6 @@ struct ProgramOptions
     struct WikiParserInfo wiki;
 };
 
-static int int_to_string(const char* in)
-{
-    char* end;
-    int result = strtod(in, &end);
-    if(0 != *end)
-    {
-        fprintf(stderr, "Can't convert «%s» into a number\n", in);
-        exit(1);
-    }
-    return result;
-}
-
 static void extract_options(struct ProgramOptions* dest, int argc, char**argv)
 {
     const struct option options[] = {
@@ -58,7 +46,7 @@ static void extract_options(struct ProgramOptions* dest, int argc, char**argv)
     dest->ok = true;
     while(1)
     {
-        const int optval = getopt_long(argc, argv, "hi:o:m:p", options,
+        const int optval = getopt_long(argc, argv, "hi:o:p", options,
                                        &option_index);
         if(optval == -1)
         {
@@ -73,10 +61,6 @@ static void extract_options(struct ProgramOptions* dest, int argc, char**argv)
 
             case 'o':
                 dest->wiki.output_name = optarg;
-            break;
-
-            case 'm':
-                dest->wiki.max_revs = int_to_string(optarg);
             break;
 
             case 'p':
@@ -110,15 +94,9 @@ static void display_help(char const* myself)
            "  -o, --output=FILENAME   Write to FILENAME (default is stdout)\n"
            "                          You must write the content to a file if\n"
            "                          your OS changes \\n chars in the output.\n"
-           "                          \n"
-           "  -m, --maxrevs=NUM       Close and reopen the output file after\n"
-           "                          NUM revisions. This mode is useful to\n"
-           "                          convert big wikis, where a one-pass\n"
-           "                          conversion will cause git to eat up all\n"
-           "                          RAM and CPU. This mode needs also -o,\n"
-           "                          and the output file should be a named\n"
-           "                          pipe. Good values are between about\n"
-           "                          100'000 < NUM < 1'000'000\n"
+           "                          The filename must contain exact one\n"
+           "                          `%%c' sequence, which get replaced by the\n"
+           "                          first char of each page.\n"
            "                          \n"
            " -p, --pipes              Create named pipes instead of files.\n"
            "                          \n"
@@ -130,6 +108,8 @@ static void display_help(char const* myself)
 
 int main(int argc, char**argv)
 {
+    fprintf(stderr, "This is a work-in-progress revision, bailing out\n");
+    return 0;
     struct ProgramOptions opts;
     extract_options(&opts, argc, argv);
     if(opts.help || !opts.ok)
