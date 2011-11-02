@@ -10,13 +10,20 @@
 #include <unistd.h>
 #include <errno.h>
 
+void files_init(struct OutFile* of, char const* name_template, bool make_fifo)
+{
+    memset(of, 0, sizeof(*of));
+    /* TODO: check if there is really on %c in the file name */
+    of->name_template = name_template;
+    if(name_template)
+    {
+        of->name_template_length = strlen(name_template);
+    }
+    of->make_fifo = make_fifo;
+}
+
 static void generate_filename(struct OutFile* file, char which)
 {
-    /* TODO: check if there is really on %c in the file name */
-    if(!file->name_template_length)
-    {
-        file->name_template_length = strlen(file->name_template);
-    }
     /* No need to reserve more space than the template, since the template is
      * always larger than the result */
     const int fn_string_len = file->name_template_length; 
@@ -59,7 +66,7 @@ void files_open(struct OutFile* of)
 {
     int i;
     const size_t handle_array_size = sizeof(of->targets)/sizeof(*of->targets);
-    assert((handle_array_size - 2) == az);
+    assert((handle_array_size - 3) == az);
     for(i=0; i < handle_array_size; ++i)
     {
         if(of->name_template)
@@ -102,9 +109,9 @@ void files_close(struct OutFile* of)
     }
 }
 
-static char page_character(struct DynString const* page_title)
+char files_page_character(char const* page_title)
 {
-    char const* walker=page_title->data;
+    char const* walker=page_title;
     bool got_colon = false;
     for(;*walker; ++walker)
     {
@@ -123,29 +130,29 @@ static char page_character(struct DynString const* page_title)
             }
         }
     }
-    return *page_title->data;
+    return *page_title;
 }
 
-static int convert_char(char in)
+int files_convert_char(char in)
 {
     const char in_up = toupper(in);
     if((in_up < 'A')||(in_up > 'Z'))
     {
         return az+1;
     }
-    return in_up-az;
+    return in_up-'A';
 }
 
-FILE* files_get_page(struct OutFile* of, struct DynString const* page_title)
+FILE* files_get_page(struct OutFile* of, char const* page_title)
 {
-    const int page_char = convert_char(page_character(page_title));
+    const int page_char = files_convert_char(files_page_character(page_title));
     const size_t handle_array_size = sizeof(of->targets)/sizeof(*of->targets);
     /* The page must be in [A-Z_]*/
     assert(page_char < (handle_array_size - 1));
     return of->targets[page_char];
 }
 
-FILE* get_meta_file(struct OutFile* of)
+FILE* files_get_meta(struct OutFile* of)
 {
     const size_t handle_array_size = sizeof(of->targets)/sizeof(*of->targets);
     return of->targets[handle_array_size-1];
@@ -154,6 +161,9 @@ FILE* get_meta_file(struct OutFile* of)
 void files_close_meta(struct OutFile* of)
 {
     const size_t handle_array_size = sizeof(of->targets)/sizeof(*of->targets);
-    fclose(of->targets[handle_array_size-1]);
-    of->targets[handle_array_size-1] = NULL;
+    if(of->name_template)
+    {
+        fclose(of->targets[handle_array_size-1]);
+        of->targets[handle_array_size-1] = NULL;
+    }
 }
