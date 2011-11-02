@@ -34,9 +34,24 @@ void check_fpc(void)
     assert('&' == files_page_character("&"));
 }
 
+void check_fcc(void)
+{
+    assert(0 == files_convert_char('a'));
+    assert(0 == files_convert_char('A'));
+    assert(1 == files_convert_char('b'));
+    assert(1 == files_convert_char('B'));
+    assert(25 == files_convert_char('z'));
+    assert(25 == files_convert_char('Z'));
+    assert(26 == files_convert_char(':'));
+    assert(26 == files_convert_char('&'));
+    assert(26 == files_convert_char('_'));
+    assert(26 == files_convert_char('='));
+}
+
 int main(void)
 {
     check_fpc();
+    check_fcc();
     printf("OK\n");
     return 0;
 }
