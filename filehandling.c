@@ -2,24 +2,35 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
+#include <assert.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <errno.h>
 
-static void generate_filename(struct OutFile* file)
+void files_init(struct OutFile* of, char const* name_template, bool make_fifo)
 {
-    if(!file->name_template_length)
+    memset(of, 0, sizeof(*of));
+    /* TODO: check if there is really on %c in the file name */
+    of->name_template = name_template;
+    if(name_template)
     {
-        file->name_template_length = strlen(file->name_template);
+        of->name_template_length = strlen(name_template);
     }
-    const int fn_string_len = file->name_template_length + 15;
+    of->make_fifo = make_fifo;
+}
+
+static void generate_filename(struct OutFile* file, char which)
+{
+    /* No need to reserve more space than the template, since the template is
+     * always larger than the result */
+    const int fn_string_len = file->name_template_length + 1; 
     setStringMinCapacity(&file->filename_cache, fn_string_len);
     snprintf(file->filename_cache.data, fn_string_len-1, file->name_template,
-            file->current_id);
+             which);
     file->filename_cache.data[fn_string_len-1] = 0;
-    file->current_id++;
 }
 
 static void gen_fifo(struct OutFile* file)
@@ -49,27 +60,110 @@ static void gen_fifo(struct OutFile* file)
     }
 }
 
-void outfile_advance(struct OutFile* file)
+const int az = 'Z' - 'A';
+
+void files_open(struct OutFile* of)
 {
-    if(file->name_template)
+    int i;
+    const size_t handle_array_size = sizeof(of->targets)/sizeof(*of->targets);
+    assert((handle_array_size - 3) == az);
+    for(i=0; i < handle_array_size; ++i)
     {
-        generate_filename(file);
-        gen_fifo(file);
-        if(file->out)
+        if(of->name_template)
         {
-            fclose(file->out);
+            /* Open files A-Z, then _, then m*/
+            const char fn_char = (i <= az) ? 'A' + i: ((i==(az+1)) ? '_' : 'm');
+            
+            generate_filename(of, fn_char);
+            gen_fifo(of);
+            of->targets[i] = fopen(of->filename_cache.data, "wb");
+            if(!of->targets[i])
+            {
+                fprintf(stderr, "Can't open file «%s» for writing.",
+                        of->name_template);
+                exit(1);
+            }
         }
-        file->out = fopen(file->filename_cache.data, "wb");
-        if(!file->out)
+        else
         {
-            fprintf(stderr, "Can't open file «%s» for writing.",
-                    file->name_template);
-            exit(1);
+            of->targets[i] = stdout;
         }
-    }
-    else
-    {
-        file->out = stdout;
     }
 }
 
+void files_close(struct OutFile* of)
+{
+    const size_t handle_array_size = sizeof(of->targets)/sizeof(*of->targets);
+    if(of->name_template)
+    {
+        /* Close only files when the output is not stdout. */
+        int i;
+        for(i=0; i<handle_array_size; ++i)
+        {
+            if(of->targets[i])
+            {
+                fclose(of->targets[i]);
+                of->targets[i] = NULL;
+            }
+        }
+    }
+}
+
+char files_page_character(char const* page_title)
+{
+    char const* walker=page_title;
+    bool got_colon = false;
+    for(;*walker; ++walker)
+    {
+        if(got_colon)
+        {
+            if(!isspace(*walker))
+            {
+                return *walker;
+            }
+        }
+        else
+        {
+            if(':' == *walker)
+            {
+                got_colon = true;
+            }
+        }
+    }
+    return *page_title;
+}
+
+int files_convert_char(char in)
+{
+    const char in_up = toupper(in);
+    if((in_up < 'A')||(in_up > 'Z'))
+    {
+        return az+1;
+    }
+    return in_up-'A';
+}
+
+FILE* files_get_page(struct OutFile* of, char const* page_title)
+{
+    const int page_char = files_convert_char(files_page_character(page_title));
+    const size_t handle_array_size = sizeof(of->targets)/sizeof(*of->targets);
+    /* The page must be in [A-Z_]*/
+    assert(page_char < (handle_array_size - 1));
+    return of->targets[page_char];
+}
+
+FILE* files_get_meta(struct OutFile* of)
+{
+    const size_t handle_array_size = sizeof(of->targets)/sizeof(*of->targets);
+    return of->targets[handle_array_size-1];
+}
+
+void files_close_meta(struct OutFile* of)
+{
+    const size_t handle_array_size = sizeof(of->targets)/sizeof(*of->targets);
+    if(of->name_template)
+    {
+        fclose(of->targets[handle_array_size-1]);
+        of->targets[handle_array_size-1] = NULL;
+    }
+}

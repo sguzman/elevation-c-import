@@ -63,6 +63,7 @@ struct ParserState
     /** Number of revisions int he current file. */
     int current_revisions;
     struct OutFile file;
+    FILE* current_file;
     time_t convert_start;
     time_t page_start;
 };
@@ -77,13 +78,6 @@ static struct TagInfo const tags[] ={
 
 #define ARRAY_SIZE(array) (sizeof(array)/sizeof(*array))
 
-static void reopen_output(struct ParserState* state)
-{
-    outfile_advance(&state->file);
-    progress(state->file.out, "Reopened output");
-    state->current_revisions = 0;
-}
-
 static void wikiHandleStartElement(struct ParserState* state)
 {
     switch(tags[state->tag].action)
@@ -97,11 +91,6 @@ static void wikiHandleStartElement(struct ParserState* state)
             clearString(&state->pageTitle);
             state->page_revisions = 0;
             state->page_start = time(NULL);
-            if(state->close_revisions &&
-               (state->current_revisions >= state->close_revisions))
-            {
-                reopen_output(state);
-            }
         break;
 
         case actCleanRev:
@@ -113,7 +102,7 @@ static void wikiHandleStartElement(struct ParserState* state)
 
         case actBlob:
             state->revision.blobref++;
-            start_blob(state->file.out, &state->revision);
+            start_blob(state->current_file, &state->revision);
         break;
 
         case actCheckStore:
@@ -143,7 +132,7 @@ static void wikiHandleStopElement(struct ParserState* state)
     switch(tags[state->tag].action)
     {
         case actBlob:
-            stop_blob(state->file.out, &state->revision);
+            stop_blob(state->current_file, &state->revision);
         break;
 
         case actCleanRev:
@@ -153,7 +142,7 @@ static void wikiHandleStopElement(struct ParserState* state)
                 &state->pageTitle,
                 0 == state->page_revisions,
             };
-            commit_rev(state->file.out, &commit);
+            commit_rev(state->current_file, &commit);
             state->page_revisions++;
             state->current_revisions++;
         }
@@ -165,24 +154,23 @@ static void wikiHandleStopElement(struct ParserState* state)
                 &state->siteName,
                 &state->siteBase,
             };
-            commit_site_info(state->file.out, &site);
-            if(state->close_revisions)
-            {
-                reopen_output(state);
-            }
+            commit_site_info(state->current_file, &site);
+            files_close_meta(&state->file);
+            state->current_file = NULL;
         }
         break;
 
         case actCleanPage:
         {
             time_t const now = time(NULL);
-            fprintf(state->file.out, "progress Overall revisions: %10d (%2.1f rps), "
+            progress(stderr, "Overall revisions: %10d (%2.1f rps), "
                                 "Imported %5d revisions (%2.1f rps) for %s\n",
                    state->revision.blobref,
                    rev_per_sec(state->revision.blobref, state->convert_start, now),
                    state->page_revisions,
                    rev_per_sec(state->page_revisions, state->page_start, now),
                    state->pageTitle.data);
+            state->current_file = NULL;
         }
         break;
 
@@ -190,11 +178,11 @@ static void wikiHandleStopElement(struct ParserState* state)
         {
             /* print statistics and clean up*/
             time_t const now = time(NULL);
-            fprintf(state->file.out, "progress Wrote %d pages in %ld sec (%2.1f rps)\n",
+            progress(stderr, "Wrote %d pages in %ld sec (%2.1f rps)\n",
                     state->revision.blobref,
                     now - state->convert_start,
                     rev_per_sec(state->revision.blobref, state->convert_start, now));
-#define PRINT_STAT(x) printStatistic(&state->x, #x, state->file.out)
+#define PRINT_STAT(x) printStatistic(&state->x, #x, stderr)
             PRINT_STAT(siteName);
             PRINT_STAT(siteBase);
             PRINT_STAT(pageTitle);
@@ -203,6 +191,11 @@ static void wikiHandleStopElement(struct ParserState* state)
             PRINT_STAT(revision.ip);
             PRINT_STAT(revision.user);
         }
+        break;
+
+        case actCheckStore:
+            state->current_file = files_get_page(&state->file,
+                                                 state->pageTitle.data);
         break;
 
         default:
@@ -249,7 +242,7 @@ static void wikiGetText(void* context, const xmlChar* content, int len)
     }
     else if(actBlob == action)
     {
-        fwrite(content, len, 1, state->file.out);
+        fwrite(content, len, 1, state->current_file);
     }
 }
 
@@ -264,10 +257,9 @@ void initWikiParser(xmlSAXHandler* target, struct ParserState* state,
     memset(state, 0, sizeof(*state));
     state->tag = ctNone;
     state->convert_start = time(NULL);
-    state->file.name_template = wpi->output_name;
-    state->file.make_fifo = wpi->make_fifo;
-    state->close_revisions = wpi->max_revs;
-    reopen_output(state);
+    files_init(&state->file, wpi->output_name, wpi->make_fifo);
+    files_open(&state->file);
+    state->current_file = files_get_meta(&state->file);
 }
 
 int parseWiki(struct WikiParserInfo const* wpi)
@@ -276,6 +268,6 @@ int parseWiki(struct WikiParserInfo const* wpi)
     xmlSAXHandler handler;
     struct ParserState state;
     initWikiParser(&handler, &state, wpi);
-    progress(state.file.out, "levitation version " VERSION "(" __DATE__ " " __TIME__ ")");
+    progress(stderr, "levitation version " VERSION "(" __DATE__ " " __TIME__ ")");
     return xmlSAXUserParseFile(&handler, &state, wpi->input_file);
 }

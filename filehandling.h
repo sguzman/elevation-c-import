@@ -26,18 +26,37 @@
 extern "C"{
 #endif
 
+#define FILE_COUNT ('Z'-'A'+1 /* One entry for each letter */ \
+                         + 1  /* One Entry for other chars */ \
+                         +1   /* The base-entry */)
+
 struct OutFile
 {
-    FILE* out;
+    FILE* targets[FILE_COUNT];
     const char* name_template;
     int name_template_length;
     bool make_fifo;
 
-    int current_id;
     struct DynString filename_cache;
 };
 
-void outfile_advance(struct OutFile* file);
+void files_init(struct OutFile* of, char const* name_template, bool make_fifo);
+
+void files_open(struct OutFile* of);
+
+void files_close_meta(struct OutFile* of);
+
+void files_close(struct OutFile* of);
+
+FILE* files_get_page(struct OutFile* of, char const* page_title);
+
+FILE* files_get_meta(struct OutFile* of);
+
+/* private API, exposed for test purposes only. */
+
+char files_page_character(char const* page_title);
+
+int files_convert_char(char in);
 
 #ifdef __cplusplus
 }
