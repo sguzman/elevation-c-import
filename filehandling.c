@@ -26,7 +26,7 @@ static void generate_filename(struct OutFile* file, char which)
 {
     /* No need to reserve more space than the template, since the template is
      * always larger than the result */
-    const int fn_string_len = file->name_template_length; 
+    const int fn_string_len = file->name_template_length + 1; 
     setStringMinCapacity(&file->filename_cache, fn_string_len);
     snprintf(file->filename_cache.data, fn_string_len-1, file->name_template,
              which);
@@ -72,7 +72,7 @@ void files_open(struct OutFile* of)
         if(of->name_template)
         {
             /* Open files A-Z, then _, then m*/
-            const char fn_char = (i < az) ? 'A' + i: ((i==az) ? '_' : 'm');
+            const char fn_char = (i <= az) ? 'A' + i: ((i==(az+1)) ? '_' : 'm');
             
             generate_filename(of, fn_char);
             gen_fifo(of);
