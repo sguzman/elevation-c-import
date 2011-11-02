@@ -108,8 +108,6 @@ static void display_help(char const* myself)
 
 int main(int argc, char**argv)
 {
-    fprintf(stderr, "This is a work-in-progress revision, bailing out\n");
-    return 0;
     struct ProgramOptions opts;
     extract_options(&opts, argc, argv);
     if(opts.help || !opts.ok)
