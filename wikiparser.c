@@ -155,6 +155,8 @@ static void wikiHandleStopElement(struct ParserState* state)
                 &state->siteBase,
             };
             commit_site_info(state->current_file, &site);
+            files_close_meta(&state->file);
+            state->current_file = NULL;
         }
         break;
 
@@ -168,6 +170,7 @@ static void wikiHandleStopElement(struct ParserState* state)
                    state->page_revisions,
                    rev_per_sec(state->page_revisions, state->page_start, now),
                    state->pageTitle.data);
+            state->current_file = NULL;
         }
         break;
 
@@ -188,6 +191,11 @@ static void wikiHandleStopElement(struct ParserState* state)
             PRINT_STAT(revision.ip);
             PRINT_STAT(revision.user);
         }
+        break;
+
+        case actCheckStore:
+            state->current_file = files_get_page(&state->file,
+                                                 state->pageTitle.data);
         break;
 
         default:
@@ -249,8 +257,9 @@ void initWikiParser(xmlSAXHandler* target, struct ParserState* state,
     memset(state, 0, sizeof(*state));
     state->tag = ctNone;
     state->convert_start = time(NULL);
-    state->file.name_template = wpi->output_name;
-    state->file.make_fifo = wpi->make_fifo;
+    files_init(&state->file, wpi->output_name, wpi->make_fifo);
+    files_open(&state->file);
+    state->current_file = files_get_meta(&state->file);
 }
 
 int parseWiki(struct WikiParserInfo const* wpi)
