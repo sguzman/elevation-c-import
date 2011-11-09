@@ -27,12 +27,12 @@ extern "C"{
 #endif
 
 #define FILE_COUNT ('Z'-'A'+1 /* One entry for each letter */ \
-                         + 1  /* One Entry for other chars */ \
-                         +1   /* The base-entry */)
+                         + 1) /* One Entry for other chars */
 
 struct OutFile
 {
     FILE* targets[FILE_COUNT];
+    FILE* meta;
     const char* name_template;
     int name_template_length;
     bool make_fifo;
@@ -42,7 +42,9 @@ struct OutFile
 
 void files_init(struct OutFile* of, char const* name_template, bool make_fifo);
 
-void files_open(struct OutFile* of);
+void files_open_meta(struct OutFile* of);
+
+void files_open_dispatch(struct OutFile* of);
 
 void files_close_meta(struct OutFile* of);
 
