@@ -156,6 +156,7 @@ static void wikiHandleStopElement(struct ParserState* state)
             };
             commit_site_info(state->current_file, &site);
             files_close_meta(&state->file);
+            files_open_dispatch(&state->file);
             state->current_file = NULL;
         }
         break;
@@ -258,7 +259,7 @@ void initWikiParser(xmlSAXHandler* target, struct ParserState* state,
     state->tag = ctNone;
     state->convert_start = time(NULL);
     files_init(&state->file, wpi->output_name, wpi->make_fifo);
-    files_open(&state->file);
+    files_open_meta(&state->file);
     state->current_file = files_get_meta(&state->file);
 }
 

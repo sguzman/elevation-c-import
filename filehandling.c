@@ -62,27 +62,50 @@ static void gen_fifo(struct OutFile* file)
 
 const int az = 'Z' - 'A';
 
-void files_open(struct OutFile* of)
+static FILE* files_open_single(struct OutFile* of, char which, bool supress_fifo)
+{
+    FILE* result = NULL;
+    generate_filename(of, which);
+    if(!supress_fifo)
+    {
+        gen_fifo(of);
+    }
+    fprintf(stderr, "opening file %s\n", of->filename_cache.data);
+    result = fopen(of->filename_cache.data, "wb");
+    fprintf(stderr, "Done\n");
+    if(!result)
+    {
+        fprintf(stderr, "Can't open file «%s» for writing.\n",
+                of->filename_cache.data);
+        exit(1);
+    }
+    return result;
+}
+
+void files_open_meta(struct OutFile* of)
+{
+    if(of->name_template)
+    {
+        of->meta = files_open_single(of, 'm', true);
+    }
+    else
+    {
+        of->meta = stdout;
+    }
+}
+
+void files_open_dispatch(struct OutFile* of)
 {
     int i;
     const size_t handle_array_size = sizeof(of->targets)/sizeof(*of->targets);
-    assert((handle_array_size - 3) == az);
+    assert((handle_array_size - 2) == az);
     for(i=0; i < handle_array_size; ++i)
     {
         if(of->name_template)
         {
-            /* Open files A-Z, then _, then m*/
-            const char fn_char = (i <= az) ? 'A' + i: ((i==(az+1)) ? '_' : 'm');
-            
-            generate_filename(of, fn_char);
-            gen_fifo(of);
-            of->targets[i] = fopen(of->filename_cache.data, "wb");
-            if(!of->targets[i])
-            {
-                fprintf(stderr, "Can't open file «%s» for writing.",
-                        of->name_template);
-                exit(1);
-            }
+            /* Open files A-Z, then _ */
+            const char fn_char = (i <= az) ? 'A' + i: '_';
+            of->targets[i] = files_open_single(of, fn_char, false);
         }
         else
         {
@@ -148,22 +171,20 @@ FILE* files_get_page(struct OutFile* of, char const* page_title)
     const int page_char = files_convert_char(files_page_character(page_title));
     const size_t handle_array_size = sizeof(of->targets)/sizeof(*of->targets);
     /* The page must be in [A-Z_]*/
-    assert(page_char < (handle_array_size - 1));
+    assert(page_char < handle_array_size);
     return of->targets[page_char];
 }
 
 FILE* files_get_meta(struct OutFile* of)
 {
-    const size_t handle_array_size = sizeof(of->targets)/sizeof(*of->targets);
-    return of->targets[handle_array_size-1];
+    return of->meta;
 }
 
 void files_close_meta(struct OutFile* of)
 {
-    const size_t handle_array_size = sizeof(of->targets)/sizeof(*of->targets);
     if(of->name_template)
     {
-        fclose(of->targets[handle_array_size-1]);
-        of->targets[handle_array_size-1] = NULL;
+        fclose(of->meta);
+        of->meta = NULL;
     }
 }
