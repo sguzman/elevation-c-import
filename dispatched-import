@@ -35,20 +35,20 @@ done
 set -ex
 
 mkdir -p $FIFO_DIR
-
-../BD-lev/levitation $PIPES -o $FIFO_DIR/%c.fi $INPUT_FILE &
+for SUB in A B C D E F G H I J K L M N O P Q R S T U V W X Y Z _
+do
+    test -p $FIFO_DIR/$SUB.fi || mkfifo $FIFO_DIR/$SUB.fi
+done
 
 mkdir -p $GIT_DIR
-cd $GIT_DIR
-git init --bare base.git
-pushd base.git
-git fast-import --date-format=rfc2822 < $FIFO_DIR/m.fi
-popd
+#cd $GIT_DIR
 
 for SUB in A B C D E F G H I J K L M N O P Q R S T U V W X Y Z _
 do
-    git clone --bare base.git $SUB.git
-    (cd $SUB.git && git fast-import --date-format=rfc2822 < $FIFO_DIR/$SUB.fi) &
+    #git init --bare $SUB.git
+    #(cd $SUB.git && git fast-import --date-format=rfc2822 --quiet < $FIFO_DIR/m.fi && git fast-import --date-format=rfc2822 --quiet < $FIFO_DIR/$SUB.fi) &
+    gzip -c <  $FIFO_DIR/$SUB.fi > $GIT_DIR/$SUB.fi.gz &
 done
 
+/home/rdi/mp/rdi/media/daten/dewiki/BD-lev/levitation $PIPES -o $FIFO_DIR/%c.fi $INPUT_FILE
 wait
