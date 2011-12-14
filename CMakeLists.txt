@@ -1,5 +1,5 @@
-project(levitation2)
-cmake_minimum_required(VERSION 2.8)
+project(levitation2 C)
+cmake_minimum_required(VERSION 2.6)
 
 include(FindLibXml2)
 
@@ -8,7 +8,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 macro(set_lev_props target)
 set_target_properties(${target} PROPERTIES
-    COMPILE_FLAGS "-g3 -Wall -Werror"
+    COMPILE_FLAGS "-g3 -Wall -Werror --std=c99"
     LINK_FLAGS -g3)
 endmacro()
 
