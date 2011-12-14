@@ -50,5 +50,5 @@ do
     gzip -c <  $FIFO_DIR/$SUB.fi > $GIT_DIR/$SUB.fi.gz &
 done
 
-/home/rdi/mp/rdi/media/daten/dewiki/BD-lev/levitation $PIPES -o $FIFO_DIR/%c.fi $INPUT_FILE
+levitation $PIPES -o $FIFO_DIR/%c.fi $INPUT_FILE
 wait
