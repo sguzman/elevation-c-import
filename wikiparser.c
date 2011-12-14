@@ -17,6 +17,7 @@
 #include "wikiparser.h"
 #include <string.h>
 #include <stddef.h>
+#include <stdarg.h>
 #include <libxml/SAX2.h>
 #include <time.h>
 #include <math.h>
@@ -247,6 +248,14 @@ static void wikiGetText(void* context, const xmlChar* content, int len)
     }
 }
 
+static void xml_error(void* ctx, const char* msg, ...)
+{
+    va_list args;
+    va_start(args, msg);
+    vfprintf(stderr, msg, args);
+    va_end(args);
+}
+
 void initWikiParser(xmlSAXHandler* target, struct ParserState* state,
                     struct WikiParserInfo const* wpi)
 {
@@ -254,6 +263,7 @@ void initWikiParser(xmlSAXHandler* target, struct ParserState* state,
     target->startElement = wikiStartElement;
     target->endElement = wikiEndElement;
     target->characters = wikiGetText;
+    target->error = xml_error;
 
     memset(state, 0, sizeof(*state));
     state->tag = ctNone;
