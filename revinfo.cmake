@@ -1,6 +1,6 @@
 find_program(GIT git)
 
-execute_process(COMMAND ${GIT} describe --long --dirty
+execute_process(COMMAND ${GIT} describe --long
   OUTPUT_VARIABLE GIT_VERSION
   WORKING_DIRECTORY ${SOURCE_DIR})
 
