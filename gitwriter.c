@@ -121,7 +121,7 @@ void commit_rev(FILE* out, struct CommitData const* commit)
     {
         fprintf(out, "from refs/heads/meta\n");
     }
-    fprintf(out, "M 644 :%d %s\n", commit->revision->blobref, file_name.data);
+    fprintf(out, "M 644 :%d content.mediawiki\n", commit->revision->blobref);
 }
 
 void commit_site_info(FILE* out, struct SiteinfoData const* site)
