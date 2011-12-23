@@ -1,13 +1,13 @@
-Compiling levitation-2
-======================
+Compiling elevation
+===================
 
-This chapter describe how to build levitation-2 from the source code. You can
+This chapter describe how to build elevation from the source code. You can
 skip this part when you got a binary distribution.
 
 Dependencies
 ------------
 
-In order to build levitation-2, you need
+In order to build elevation, you need
 
 * a C compiler (tested with gcc (Debian 4.3.5-4))
 * CMake 2.8
@@ -18,7 +18,7 @@ In order to build levitation-2, you need
 Build
 -----
 
-The build of levitation-2 is straight-forward:
+The build of elevation is straight-forward:
 
 .. code-block:: sh
 
@@ -31,7 +31,8 @@ The build of levitation-2 is straight-forward:
   # Build the software
   make
   # Test if it works
-  ./levitation --help
+  ./elevtest
+  ./elevation --help
   
 
 Documentation
