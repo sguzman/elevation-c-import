@@ -1,4 +1,4 @@
-/*  This is part of levitation-2, the  MediaWiki to git trasformator.
+/*  This is part of elevation, the  MediaWiki to git trasformator.
     Copyright © 2011  Rüdiger Ranft <_rdi_@web.de>
 
     This program is free software: you can redistribute it and/or modify

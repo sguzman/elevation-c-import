@@ -1,4 +1,4 @@
-/*  This is part of levitation-2, the  MediaWiki to git trasformator.
+/*  This is part of elevation, the  MediaWiki to git trasformator.
     Copyright © 2011  Rüdiger Ranft <_rdi_@web.de>
 
     This program is free software: you can redistribute it and/or modify
@@ -84,7 +84,7 @@ static void extract_options(struct ProgramOptions* dest, int argc, char**argv)
 
 static void display_help(char const* myself)
 {
-    printf("levitation " VERSION "\n"
+    printf("elevation " VERSION "\n"
            "created at " __DATE__ " " __TIME__ "\n"
            "                          \n"
            "                          \n"

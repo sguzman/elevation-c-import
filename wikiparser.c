@@ -1,4 +1,4 @@
-/*  This is part of levitation-2, the  MediaWiki to git trasformator.
+/*  This is part of elevation, the  MediaWiki to git trasformator.
     Copyright © 2011  Rüdiger Ranft <_rdi_@web.de>
 
     This program is free software: you can redistribute it and/or modify
@@ -279,6 +279,6 @@ int parseWiki(struct WikiParserInfo const* wpi)
     xmlSAXHandler handler;
     struct ParserState state;
     initWikiParser(&handler, &state, wpi);
-    progress(stderr, "levitation version " VERSION "(" __DATE__ " " __TIME__ ")");
+    progress(stderr, "elevation version " VERSION "(" __DATE__ " " __TIME__ ")");
     return xmlSAXUserParseFile(&handler, &state, wpi->input_file);
 }
