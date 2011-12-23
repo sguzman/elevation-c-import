@@ -5,32 +5,19 @@ General usage
 -------------
 
 Elevation is a command line program, which read the XML file and writes
-a `git fast-import` stream to feed git. The Importers user name is given
-along with the input file name at the command line, and the output is typically
+a `git fast-import` stream to feed git. The output is typically
 fed directly into git fast-import. The following shell script shows a typical
 use case.
 
 .. code-block:: sh
 
   $ git init --bare wiki.git
-  $ ./elevation -n 'My Name <mn@example.com>' dump.xml | \
+  $ ./elevation dump.xml | \
     GIT_DIR=wiki.git git fast-import --date-format=rfc2822
 
-Windows problems
-----------------
-
-Since windows rewrites the line endings of text, which is written on the so
-called standard-output, it is required to write the import data into a
-temporary file before.
-
-.. code-block:: bat
-
-  c:\foo> elevation.exe -n "My Name <mn@example.com>" -o tempfile.fi dump.xml
-  c:\foo> git init --bare wiki.git
-  c:\foo> cd wiki.git
-  c:\foo\wiki.git> git fast-import --date-format=rfc2822 < ..\tempfile.fi
-  c:\foo\wiki.git> del ..\tempfile.fi
-
+Handling on Windows
+-------------------
+TO BE DONE
 
 Special parameters
 ------------------

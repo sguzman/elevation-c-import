@@ -17,29 +17,13 @@ which is of type integer. The git-fastimport documentation nowhere states,
 which is the valid range of this parameter. There is a risk, that this is a
 32 bit signed integer, and can overroll with large wikis.
 
-Nice to have
-------------
-
-Statistics
-..........
-
-During the import there should be a statistic, how many revisions per second
-are imported (should go along with the line about the last imported page).
-
-After the import, following parameters should be printed:
-
-* used time
-* revision count of all pages
-* page count
-* average reisions per page
-* memory usage
-
+Important
+---------
 
 Tests
 .....
 
-Currently there is not a single software test. There should be at least a test
-to check if the created software can successfully import a sample dump file.
+There should be more tests.
 
 Somebody Else's Problem(TM)
 ---------------------------

@@ -12,7 +12,7 @@ Check out out a page
 
 You can check out a page by checking out the corresponding branch. To view the
 "Linux" page, you run ``git checkout Linux``. Afterwards the newest revision of
-the "Linux" page is in the current directory in a ``Linux`` called file.
+the "Linux" page is in the current directory in a ``content.mediawiki`` called file.
 
 Get the history of a page
 -------------------------
