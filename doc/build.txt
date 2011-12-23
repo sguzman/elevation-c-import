@@ -10,7 +10,7 @@ Dependencies
 In order to build elevation, you need
 
 * a C compiler (tested with gcc (Debian 4.3.5-4))
-* CMake 2.8
+* CMake 2.6
 * libxml2 + development files
 * an implementation of getopt (contained in the mingw-gcc, should be present on
   any UNIX-like system)
