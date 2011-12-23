@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Levitation-2 documentation build configuration file, created by
+# Elevation documentation build configuration file, created by
 # sphinx-quickstart on Tue Oct 18 21:20:06 2011.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -40,7 +40,7 @@ source_suffix = '.txt'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Levitation-2'
+project = u'Elevation'
 copyright = u'2011, Rüdiger Ranft'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -164,7 +164,7 @@ html_use_index = False
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'Levitation-2doc'
+htmlhelp_basename = 'Elevationdoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -183,7 +183,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'Levitation-2.tex', u'Levitation-2 Documentation',
+  ('index', 'Elevation.tex', u'Elevation Documentation',
    u'Rüdiger Ranft', 'manual'),
 ]
 
@@ -227,8 +227,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'Levitation-2', u'Levitation-2 Documentation', u'Rüdiger Ranft',
-   'Levitation-2', 'One line description of project.', 'Miscellaneous'),
+  ('index', 'Elevation', u'Elevation Documentation', u'Rüdiger Ranft',
+   'Elevation', 'One line description of project.', 'Miscellaneous'),
 ]
 
 # Documents to append as an appendix to all manuals.

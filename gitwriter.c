@@ -108,7 +108,7 @@ void commit_rev(FILE* out, struct CommitData const* commit)
     create_filename(&file_name, commit->title);
     fprintf(out, "commit refs/heads/%s\n", file_name.data);
     print_author(out, commit->revision, git_date);
-    fprintf(out, "committer Levitation <elevation@example.com> %s\n", git_date);
+    fprintf(out, "committer Elevation <elevation@example.com> %s\n", git_date);
     if(!stringIsEmpty(&commit->revision->comment))
     {
         fprintf(out, "data %d\n%s\n", stringLength(&commit->revision->comment), commit->revision->comment.data);
@@ -127,7 +127,7 @@ void commit_rev(FILE* out, struct CommitData const* commit)
 void commit_site_info(FILE* out, struct SiteinfoData const* site)
 {
     fprintf(out, "commit refs/heads/meta\n");
-    fprintf(out, "committer Levitation <elevation@example.com> 15 Jan 12:00:00 2001\n");
+    fprintf(out, "committer Elevation <elevation@example.com> 15 Jan 12:00:00 2001\n");
     fprintf(out, "data <<EOF\nInitial meta data\nEOF\n\n"
            "M 644 inline meta/siteinfo.txt\n"
            "data <<EOF_65a495a\n"

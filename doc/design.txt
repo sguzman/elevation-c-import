@@ -29,7 +29,7 @@ its own branch.
 Usage reason
 ............
 
-Levitation creates one branch per wiki-page, which contains all revisions of
+Elevation creates one branch per wiki-page, which contains all revisions of
 this page. This means that this branch contains all revisions of this page,
 without the revisions of other pages.
 
@@ -55,7 +55,7 @@ takes lots of computation power.
 The ``meta`` branch
 -------------------
 
-Levitation creates a ``meta`` named branch, which contains the name of the
+Elevation creates a ``meta`` named branch, which contains the name of the
 site, and the base URL. This branch fullfils two reasons:
 
 * It stores some meta informations about the source wiki
