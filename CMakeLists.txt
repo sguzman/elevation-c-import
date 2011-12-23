@@ -1,4 +1,4 @@
-project(levitation2 C)
+project(elevation C)
 cmake_minimum_required(VERSION 2.6)
 
 include(FindLibXml2)
@@ -6,19 +6,19 @@ include(FindLibXml2)
 include_directories(${LIBXML2_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-macro(set_lev_props target)
+macro(set_elev_props target)
 set_target_properties(${target} PROPERTIES
     COMPILE_FLAGS "-g3 -Wall -Werror --std=c99"
     LINK_FLAGS -g3)
 endmacro()
 
-add_library(lev filehandling.c dynstring.c wikiparser.c gitwriter.c)
-add_dependencies(lev versionheader)
-set_lev_props(lev)
+add_library(elev filehandling.c dynstring.c wikiparser.c gitwriter.c)
+add_dependencies(elev versionheader)
+set_elev_props(elev)
 
-add_executable(levitation levitation.c)
-target_link_libraries(levitation lev ${LIBXML2_LIBRARIES})
-set_lev_props(levitation)
+add_executable(elevation elevation.c)
+target_link_libraries(elevation elev ${LIBXML2_LIBRARIES})
+set_elev_props(elevation)
 
 add_custom_target(versionheader ALL
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/version.h)
@@ -30,8 +30,8 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/version.h non_existant_fil
                          -P ${CMAKE_CURRENT_SOURCE_DIR}/revinfo.cmake)
 
 
-add_dependencies(levitation versionheader)
+add_dependencies(elevation versionheader)
 
-add_executable(levtest levtest.c)
-set_lev_props(levtest)
-target_link_libraries(levtest lev)
+add_executable(elevtest elevtest.c)
+set_elev_props(elevtest)
+target_link_libraries(elevtest elev)
