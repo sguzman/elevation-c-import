@@ -6,7 +6,7 @@ This page consist of different things that need to be done.
 Show stoppers
 -------------
 
-There are currently the following known problems in levitation-2, which
+There are currently the following known problems in elevation, which
 prohibit the use of the software in a productive environment.
 
 Check the range of :mark commands

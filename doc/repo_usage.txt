@@ -4,7 +4,7 @@ How to use the resulting git repository
 Get a list of all pages
 -----------------------
 
-Since levitation-2 creates a branch for each page, you need to ask git to
+Since elevation creates a branch for each page, you need to ask git to
 display the branches. This is done with ``git branch``.
 
 Check out out a page

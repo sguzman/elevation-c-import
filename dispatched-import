@@ -50,5 +50,5 @@ do
     gzip -c <  $FIFO_DIR/$SUB.fi > $GIT_DIR/$SUB.fi.gz &
 done
 
-levitation $PIPES -o $FIFO_DIR/%c.fi $INPUT_FILE
+elevation $PIPES -o $FIFO_DIR/%c.fi $INPUT_FILE
 wait
