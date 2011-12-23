@@ -87,7 +87,6 @@ static void display_help(char const* myself)
     printf("elevation " VERSION "\n"
            "created at " __DATE__ " " __TIME__ "\n"
            "                          \n"
-           "                          \n"
            "usage: %s [OPTION] INPUT-FILE\n"
            "OPTIONS\n\n"
            "  -h, --help              Display this help and exit.\n"
