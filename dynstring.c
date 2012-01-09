@@ -24,6 +24,10 @@ void appendString(struct DynString* string, const char* input, int length)
 {
     const int totalSize = string->length + length + 1;
     setStringMinCapacity(string, totalSize);
+    if(string->max_length < (totalSize-1))
+    {
+        string->max_length = totalSize-1;
+    }
     strncpy(string->data + string->length, input, length);
     string->length = totalSize - 1;
     string->data[totalSize - 1] = 0;
@@ -51,7 +55,6 @@ void setStringMinCapacity(struct DynString* string, int size)
         }
         string->size = size;
         string->allocations++;
-        string->max_length = size;
     }
 }
 
