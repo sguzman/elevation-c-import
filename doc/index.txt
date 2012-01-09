@@ -19,6 +19,7 @@ Contents:
    design
    repo_usage
    todo
+   internals
 
 
 Indices and tables

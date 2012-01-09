@@ -5,19 +5,18 @@ General usage
 -------------
 
 Elevation is a command line program, which read the XML file and writes
-a `git fast-import` stream to feed git. The output is typically
-fed directly into git fast-import. The following shell script shows a typical
-use case.
+a `git fast-import` stream to feed git.
 
 .. code-block:: sh
 
-  $ git init --bare wiki.git
-  $ ./elevation dump.xml | \
+  $ ./elevation -o stream_%c.git dump.xml 
+  $ for 
     GIT_DIR=wiki.git git fast-import --date-format=rfc2822
 
 Handling on Windows
 -------------------
-TO BE DONE
+Since the current output handling requires a case-sensitive file system, it is
+at the current state impossible to use elevation on windows.
 
 Special parameters
 ------------------

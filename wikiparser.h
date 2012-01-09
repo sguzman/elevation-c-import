@@ -24,13 +24,20 @@
 extern "C"{
 #endif
 
+/** \brief The conversation configuration */
 struct WikiParserInfo
 {
+    /** \brief The name of the input file. */
     char const* input_file;
+
+    /** \brief The template name for the output file. */
     const char* output_name;
+
+    /** \brief Shall the output be files(false) or named pipes(true). */
     bool make_fifo;
 };
 
+/** \brief convert the wiki to fast-import streams. */
 int parseWiki(struct WikiParserInfo const* wpi);
 
 #ifdef __cplusplus

@@ -26,8 +26,10 @@
 extern "C"{
 #endif
 
+/** \brief Own data type for the mark commands in the output stream. */
 typedef int mark_type;
 
+/** \brief Data about one single revision of a page. */
 struct RevData
 {
     struct DynString time;
@@ -37,6 +39,7 @@ struct RevData
     mark_type blobref;
 };
 
+/** \brief The data of one git commit. */
 struct CommitData
 {
     struct RevData const* revision;
@@ -44,6 +47,7 @@ struct CommitData
     bool start_branch;
 };
 
+/** \brief The Data of the meta data of the wiki. */
 struct SiteinfoData
 {
     struct DynString const* name;
@@ -51,10 +55,21 @@ struct SiteinfoData
     mark_type* blobref;
 };
 
+/** \brief Emmit a BLOB command to the output file. */
 void start_blob(FILE* out, struct RevData const* revision);
+
+/** \brief Emmit the end of the BLOB command to the output file. */
 void stop_blob(FILE* out, struct RevData const* revision);
+
+/** \brief Emmit a COMMIT command to the output file. */
 void commit_rev(FILE* out, struct CommitData const* details);
+
+/** \brief Create the `meta` commit. */
 void commit_site_info(FILE* out, struct SiteinfoData const* site);
+
+/** \brief Put a PROGRESS command to the output file.
+  *
+  * `git fast-import` later displays this message. */
 void progress(FILE* out, const char* what, ...) __attribute__ ((format (printf, 2, 3)));
 
 

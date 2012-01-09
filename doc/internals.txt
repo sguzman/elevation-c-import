@@ -1,0 +1,20 @@
+Technical details
+=================
+
+C Language
+----------
+
+Despite my preference for python I choose C as the language for this project
+because it shall be suitable to import very large MediaWiki installations
+(such as the German Wikipedia, which is about 1TB large). To support this
+requirement, it is better to use C, since C gives more control about different
+runtime details, like memory management.
+
+String memory allocation
+------------------------
+
+The allocation of memory for all strings is done in ``dynstring.c``. All
+strings are grow-only. This behavior minimizes the needed calls to ``malloc``,
+since after a short period of time the strings are grown to their maximum size.
+So the speed impact of ``malloc`` when it reassembles fragmented memory is
+neglected.

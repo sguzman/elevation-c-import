@@ -29,29 +29,52 @@ extern "C"{
 #define FILE_COUNT ('Z'-'A'+1 /* One entry for each letter */ \
                          + 1) /* One Entry for other chars */
 
+/** \brief This structure holds all FILE pointers for the stream outputs. */
 struct OutFile
 {
+    /** \brief The file pointers for the topic (starting with A-Z and special
+      * chars) streams */
     FILE* targets[FILE_COUNT];
+
+    /** \brief The file stream for the metadata branch */
     FILE* meta;
+
+    /** \brief The filename template */
     const char* name_template;
+
+    /** \brief The string length of \sa name_template*/
     int name_template_length;
+
+    /** \brief Flag to determine if the output should be realized as named
+      * pipes instead of regular files.*/
     bool make_fifo;
 
+    /** \brief A cache to generate the file names for each topic branch. */
     struct DynString filename_cache;
 };
 
+/** \brief Opens all topic files. */
 void files_init(struct OutFile* of, char const* name_template, bool make_fifo);
 
+/** \brief open the meta file. */
 void files_open_meta(struct OutFile* of);
 
+/** \brief Decide if output should go to different files or stdout.
+  *
+  * If the name template is not NULL, different files will be opened. Else
+  * stdout will be assigned to all topic file handles. */
 void files_open_dispatch(struct OutFile* of);
 
+/** \brief Closes the meta branch. */
 void files_close_meta(struct OutFile* of);
 
+/** \brief closes the topic files. */
 void files_close(struct OutFile* of);
 
+/** \brief Returns the topic file handle corresponding to the page title.*/
 FILE* files_get_page(struct OutFile* of, char const* page_title);
 
+/** \brief Returns the file handle for the meta branch. */
 FILE* files_get_meta(struct OutFile* of);
 
 /* private API, exposed for test purposes only. */

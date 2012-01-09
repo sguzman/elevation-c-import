@@ -46,7 +46,7 @@ static void extract_options(struct ProgramOptions* dest, int argc, char**argv)
     dest->ok = true;
     while(1)
     {
-        const int optval = getopt_long(argc, argv, "hi:o:p", options,
+        const int optval = getopt_long(argc, argv, "ho:p", options,
                                        &option_index);
         if(optval == -1)
         {
