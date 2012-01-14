@@ -35,6 +35,35 @@ The build of elevation is straight-forward:
   ./elevation --help
   
 
+Build for Windows
+-----------------
+
+General
++++++++
+
+You need 
+
+* `libxml2`_ and its dependency libraries (currently these are libiconv and
+  zlib)
+* cmake 2.6
+* mingw
+
+.. _libxml2: ftp://ftp.zlatkovic.com/libxml/
+
+To configure configure the build system a
+``-DLIBXML2DIR=»Path to the folder«``-Parameter is appended to the cmake call::
+
+ > cmake -DLIBXML2DIR=c:/stuff/libxml2 ../elevation
+
+Cross-compile
++++++++++++++
+
+There is a cross-compile script suitable for debian based systems. You need the
+unpacked win32 dependency libraries unpacked in a folder. Then you configure
+the build system with the ``crosscompile`` script::
+
+  $ ./crosscompile ../libxml-win32 ../build-elevation
+
 Documentation
 -------------
 
