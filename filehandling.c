@@ -10,6 +10,11 @@
 #include <unistd.h>
 #include <errno.h>
 
+#ifdef _WIN32
+#include <io.h>
+#include <fcntl.h>
+#endif
+
 enum TemplateKind check_template(const char* name_template)
 {
     if(!name_template)
@@ -138,7 +143,9 @@ static FILE* files_open_single(struct OutFile* of, const char* which,
     FILE* result = NULL;
     if(omStdout == of->output_mode)
     {
-        /* TODO: change stdout to binary on WIN32 */
+#ifdef _WIN32
+        _setmode(1, O_BINARY);
+#endif
         return stdout;
     }
     generate_filename(of, which);
