@@ -95,8 +95,8 @@ static void display_help(char const* myself)
            "  -o, --output=FILENAME   Write to FILENAME (default is stdout)\n"
            "                          You must write the content to a file if\n"
            "                          your OS changes \\n chars in the output.\n"
-           "                          The filename must contain exact one\n"
-           "                          `%%c' sequence, which get replaced by the\n"
+           "                          The filename may contain zero or one\n"
+           "                          `%%s' sequence, which get replaced by the\n"
            "                          first char of each page.\n"
            "                          \n"
 #ifndef _WIN32
