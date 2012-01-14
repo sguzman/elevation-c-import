@@ -13,7 +13,7 @@
 void files_init(struct OutFile* of, char const* name_template, bool make_fifo)
 {
     memset(of, 0, sizeof(*of));
-    /* TODO: check if there is really on %c in the file name */
+    /* TODO: check if there is really one %s in the file name */
     of->name_template = name_template;
     if(name_template)
     {
