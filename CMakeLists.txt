@@ -4,8 +4,16 @@ cmake_minimum_required(VERSION 2.6)
 if(not ${LIBXML2DIR})
     include(FindLibXml2)
 else()
+    # I had a hard time to figure out how to give the list of libraries via
+    # a -DLIBXML2_LIBRARIES=... switch on the command line, so I placed the
+    # needed libraries in this place. This works as long as you use the widely
+    # used libraries from ftp://ftp.zlatkovic.com/libxml/, but can fail if
+    # you use a libxml2 version where some parts are different compiled.
     set(LIBXML2_INCLUDE_DIR "${LIBXML2DIR}/include")
-    set(LIBXML2_LIBRARIES "${LIBXML2DIR}/lib/zlib.lib" "${LIBXML2DIR}/lib/iconv.lib" "${LIBXML2DIR}/lib/libxml2.lib")
+    set(LIBXML2_LIBRARIES
+        "${LIBXML2DIR}/lib/zlib.lib"
+        "${LIBXML2DIR}/lib/iconv.lib"
+        "${LIBXML2DIR}/lib/libxml2.lib")
 endif()
 
 include_directories(${LIBXML2_INCLUDE_DIR})
