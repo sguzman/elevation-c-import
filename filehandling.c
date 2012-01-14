@@ -134,6 +134,11 @@ static FILE* files_open_single(struct OutFile* of, const char* which,
                                bool supress_fifo)
 {
     FILE* result = NULL;
+    if(omStdout == of->output_mode)
+    {
+        /* TODO: change stdout to binary on WIN32 */
+        return stdout;
+    }
     generate_filename(of, which);
     if(!supress_fifo)
     {
@@ -153,51 +158,87 @@ static FILE* files_open_single(struct OutFile* of, const char* which,
 
 void files_open_meta(struct OutFile* of)
 {
-    if(of->name_template)
+    FILE** storage = NULL;
+    switch(of->output_mode)
     {
-        of->meta = files_open_single(of, "meta", true);
+        case omStdout:
+        case omOneFile:
+            storage = &of->files.single;
+        break;
+
+        case omManyFiles:
+            storage = &of->files.many.meta;
+        break;
     }
-    else
+    assert(storage);
+    if(!*storage)
     {
-        of->meta = stdout;
+        *storage = files_open_single(of, "meta", true);
     }
 }
 
 void files_open_dispatch(struct OutFile* of)
 {
     int i;
-    const size_t handle_array_size = sizeof(of->targets)/sizeof(*of->targets);
+    const size_t handle_array_size = sizeof(of->files.many.targets)
+                                     /sizeof(*of->files.many.targets);
     assert((handle_array_size - 2) == az);
     for(i=0; i < handle_array_size; ++i)
     {
-        if(of->name_template)
+        FILE** storage = NULL;
+
+        switch(of->output_mode)
+        {
+            case omStdout:
+            case omOneFile:
+                storage = &of->files.single;
+            break;
+
+            case omManyFiles:
+                storage = &(of->files.many.targets[i]);
+            break;
+        }
+        assert(storage);
+        if(!*storage)
         {
             /* Open files A-Z, then _ */
             const char fn_char[] = {(i <= az) ? 'A' + i: '_', 0};
-            of->targets[i] = files_open_single(of, fn_char, false);
-        }
-        else
-        {
-            of->targets[i] = stdout;
+            *storage = files_open_single(of, fn_char, false);
         }
     }
 }
 
+static void close_file(FILE** file)
+{
+    if(*file)
+    {
+        fclose(*file);
+    }
+    *file = NULL;
+}
+
 void files_close(struct OutFile* of)
 {
-    const size_t handle_array_size = sizeof(of->targets)/sizeof(*of->targets);
-    if(of->name_template)
+    switch(of->output_mode)
     {
-        /* Close only files when the output is not stdout. */
-        int i;
-        for(i=0; i<handle_array_size; ++i)
+        case omStdout:
+            /** Do Nothing */
+        break;
+
+        case omOneFile:
+            close_file(&of->files.single);
+        break;
+
+        case omManyFiles:
         {
-            if(of->targets[i])
+            const size_t handle_array_size = sizeof(of->files.many.targets)
+                                             /sizeof(*of->files.many.targets);
+            for(int i=0; i<handle_array_size; ++i)
             {
-                fclose(of->targets[i]);
-                of->targets[i] = NULL;
+                close_file(&of->files.many.targets[i]);
             }
         }
+        break;
     }
 }
 
@@ -237,23 +278,46 @@ int files_convert_char(char in)
 
 FILE* files_get_page(struct OutFile* of, char const* page_title)
 {
-    const int page_char = files_convert_char(files_page_character(page_title));
-    const size_t handle_array_size = sizeof(of->targets)/sizeof(*of->targets);
-    /* The page must be in [A-Z_]*/
-    assert(page_char < handle_array_size);
-    return of->targets[page_char];
+    switch(of->output_mode)
+    {
+        case omStdout:
+        case omOneFile:
+            return of->files.single;
+
+        case omManyFiles:
+        {
+            const int page_char = files_convert_char(
+                                    files_page_character(page_title));
+            const size_t handle_array_size = sizeof(of->files.many.targets)
+                                             /sizeof(*of->files.many.targets);
+            /* The page must be in [A-Z_]*/
+            assert(page_char < handle_array_size);
+            return of->files.many.targets[page_char];
+        }
+    }
+    assert("This statement should not be reached" == 0);
+    return NULL;
 }
 
 FILE* files_get_meta(struct OutFile* of)
 {
-    return of->meta;
+    switch(of->output_mode)
+    {
+        case omStdout:
+        case omOneFile:
+            return of->files.single;
+
+        case omManyFiles:
+            return of->files.many.meta;
+    }
+    assert("This statement should not be reached" == 0);
+    return NULL;
 }
 
 void files_close_meta(struct OutFile* of)
 {
-    if(of->name_template)
+    if(omManyFiles == of->output_mode)
     {
-        fclose(of->meta);
-        of->meta = NULL;
+        close_file(&of->files.many.meta);
     }
 }

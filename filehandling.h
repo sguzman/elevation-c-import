@@ -37,12 +37,23 @@ struct OutFile
 {
     enum OutputMode output_mode;
 
-    /** \brief The file pointers for the topic (starting with A-Z and special
-      * chars) streams */
-    FILE* targets[FILE_COUNT];
+    union
+    {
+        /** The members of this struct are used, when there should one file per
+          * starting letter be created. */
+        struct
+        {
+            /** \brief The file pointers for the topic (starting with A-Z and
+              * special chars) streams */
+            FILE* targets[FILE_COUNT];
 
-    /** \brief The file stream for the metadata branch */
-    FILE* meta;
+            /** \brief The file stream for the metadata branch */
+            FILE* meta;
+        } many;
+
+        /** \brief This FILE is used, when stdout or one single file is used. */
+        FILE* single;
+    } files;
 
     /** \brief The filename template */
     const char* name_template;
