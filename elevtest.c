@@ -48,10 +48,25 @@ void check_fcc(void)
     assert(26 == files_convert_char('='));
 }
 
+void check_ftemplate(void)
+{
+    /* This function checks the correct work of the file template determining
+     * function. */
+    assert(tkNone == check_template(NULL));
+    assert(tkSingle == check_template(""));
+    assert(tkSingle == check_template("abc"));
+    assert(tkReplace == check_template("%s"));
+    assert(tkReplace == check_template("ab%sc"));
+    assert(tkError == check_template("%%"));
+    assert(tkError == check_template("%c"));
+    assert(tkError == check_template("%s%"));
+}
+
 int main(void)
 {
     check_fpc();
     check_fcc();
+    check_ftemplate();
     printf("OK\n");
     return 0;
 }

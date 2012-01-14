@@ -83,6 +83,10 @@ char files_page_character(char const* page_title);
 
 int files_convert_char(char in);
 
+enum TemplateKind{tkNone, tkSingle, tkReplace, tkError};
+
+enum TemplateKind check_template(const char* name_template);
+
 #ifdef __cplusplus
 }
 #endif

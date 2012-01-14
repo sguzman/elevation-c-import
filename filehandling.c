@@ -10,6 +10,54 @@
 #include <unistd.h>
 #include <errno.h>
 
+enum TemplateKind check_template(const char* name_template)
+{
+    if(!name_template)
+    {
+        return tkNone;
+    }
+    {
+        char state = 'v';
+        /* States: 'v'anilla: no percent sing seen yet
+                   'p'ercent: one percent sing seen
+                   's':       's' char after percent sign seen */
+        /* const char* walker; */
+        for(const char* walker = name_template; *walker; walker++)
+        {
+            switch(state)
+            {
+                case 'v':
+                    if('%' == *walker)
+                    {
+                        state = 'p';
+                    }
+                break;
+
+                case 'p':
+                    if('s' == *walker)
+                    {
+                        state = 's';
+                    }else{
+                        return tkError;
+                    }
+                break;
+
+                case 's':
+                    if('%' == *walker)
+                    {
+                        return tkError;
+                    }
+                break;
+            }
+        }
+        if(state == 's')
+        {
+            return tkReplace;
+        }
+    }
+    return tkSingle;
+}
+
 void files_init(struct OutFile* of, char const* name_template, bool make_fifo)
 {
     memset(of, 0, sizeof(*of));
