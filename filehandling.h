@@ -29,9 +29,14 @@ extern "C"{
 #define FILE_COUNT ('Z'-'A'+1 /* One entry for each letter */ \
                          + 1) /* One Entry for other chars */
 
+/** In which mode should the program run? */
+enum OutputMode {omStdout, omOneFile, omManyFiles};
+
 /** \brief This structure holds all FILE pointers for the stream outputs. */
 struct OutFile
 {
+    enum OutputMode output_mode;
+
     /** \brief The file pointers for the topic (starting with A-Z and special
       * chars) streams */
     FILE* targets[FILE_COUNT];

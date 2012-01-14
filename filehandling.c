@@ -61,7 +61,27 @@ enum TemplateKind check_template(const char* name_template)
 void files_init(struct OutFile* of, char const* name_template, bool make_fifo)
 {
     memset(of, 0, sizeof(*of));
-    /* TODO: check if there is really one %s in the file name */
+    switch(check_template(name_template))
+    {
+        case tkNone:
+            of->output_mode = omStdout;
+        break;
+
+        case tkSingle:
+            of->output_mode = omOneFile;
+        break;
+
+        case tkReplace:
+            of->output_mode = omManyFiles;
+        break;
+
+        case tkError:
+            fprintf(stderr,
+                    "The file name `%s' is not a valid filename template.\n",
+                    name_template);
+            exit(1);
+        break;
+    }
     of->name_template = name_template;
     if(name_template)
     {
@@ -70,11 +90,11 @@ void files_init(struct OutFile* of, char const* name_template, bool make_fifo)
     of->make_fifo = make_fifo;
 }
 
-static void generate_filename(struct OutFile* file, char which)
+static void generate_filename(struct OutFile* file, const char* which)
 {
     /* No need to reserve more space than the template, since the template is
      * always larger than the result */
-    const int fn_string_len = file->name_template_length + 1; 
+    const int fn_string_len = file->name_template_length + strlen(which) + 1; 
     setStringMinCapacity(&file->filename_cache, fn_string_len);
     snprintf(file->filename_cache.data, fn_string_len-1, file->name_template,
              which);
@@ -110,7 +130,8 @@ static void gen_fifo(struct OutFile* file)
 
 const int az = 'Z' - 'A';
 
-static FILE* files_open_single(struct OutFile* of, char which, bool supress_fifo)
+static FILE* files_open_single(struct OutFile* of, const char* which,
+                               bool supress_fifo)
 {
     FILE* result = NULL;
     generate_filename(of, which);
@@ -134,7 +155,7 @@ void files_open_meta(struct OutFile* of)
 {
     if(of->name_template)
     {
-        of->meta = files_open_single(of, 'm', true);
+        of->meta = files_open_single(of, "meta", true);
     }
     else
     {
@@ -152,7 +173,7 @@ void files_open_dispatch(struct OutFile* of)
         if(of->name_template)
         {
             /* Open files A-Z, then _ */
-            const char fn_char = (i <= az) ? 'A' + i: '_';
+            const char fn_char[] = {(i <= az) ? 'A' + i: '_', 0};
             of->targets[i] = files_open_single(of, fn_char, false);
         }
         else
