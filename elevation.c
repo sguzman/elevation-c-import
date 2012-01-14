@@ -37,7 +37,9 @@ static void extract_options(struct ProgramOptions* dest, int argc, char**argv)
         {"help", no_argument, NULL, 'h'},
         {"output", required_argument, NULL, 'o'},
         {"maxrevs", required_argument, NULL, 'm'},
+#ifndef _WIN32
         {"pipes", no_argument, NULL, 'p'},
+#endif
         {0, 0, 0, 0},
     };
     int option_index = 0;
@@ -97,8 +99,10 @@ static void display_help(char const* myself)
            "                          `%%c' sequence, which get replaced by the\n"
            "                          first char of each page.\n"
            "                          \n"
+#ifndef _WIN32
            " -p, --pipes              Create named pipes instead of files.\n"
            "                          \n"
+#endif
            "\n"
            "The INPUT-FILE must be the last parameter on the command line, and\n"
            "is a required parameter.\n",

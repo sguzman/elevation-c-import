@@ -14,10 +14,7 @@ a `git fast-import` stream to feed git.
 
 Handling on Windows
 -------------------
-Since the current output handling requires a case-sensitive file system, it is
-at the current state impossible to use elevation on windows. The alternative to
-write the output to stdout is also not available on windows, since windows
-changes the newline characters there.
+Work in progress, stay tuned......
 
 Special parameters
 ------------------

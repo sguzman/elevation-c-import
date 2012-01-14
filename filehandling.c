@@ -103,6 +103,7 @@ static void generate_filename(struct OutFile* file, const char* which)
 
 static void gen_fifo(struct OutFile* file)
 {
+#ifndef _WIN32
     if(file->make_fifo)
     {
         if(mkfifo(file->filename_cache.data, 0644))
@@ -126,6 +127,7 @@ static void gen_fifo(struct OutFile* file)
             }
         }
     }
+#endif
 }
 
 const int az = 'Z' - 'A';

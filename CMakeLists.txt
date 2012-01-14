@@ -1,7 +1,12 @@
 project(elevation C)
 cmake_minimum_required(VERSION 2.6)
 
-include(FindLibXml2)
+if(not ${LIBXML2DIR})
+    include(FindLibXml2)
+else()
+    set(LIBXML2_INCLUDE_DIR "${LIBXML2DIR}/include")
+    set(LIBXML2_LIBRARIES "${LIBXML2DIR}/lib/zlib.lib" "${LIBXML2DIR}/lib/iconv.lib" "${LIBXML2DIR}/lib/libxml2.lib")
+endif()
 
 include_directories(${LIBXML2_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
