@@ -12,10 +12,6 @@ a `git fast-import` stream to feed git.
   git init --bare wiki.git
   ./elevation dump.xml |GIT_DIR=wiki.git git fast-import --date-format=rfc2822
 
-Handling on Windows
--------------------
-Work in progress, stay tuned......
-
 Special parameters
 ------------------
 
