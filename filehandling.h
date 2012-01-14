@@ -29,15 +29,31 @@ extern "C"{
 #define FILE_COUNT ('Z'-'A'+1 /* One entry for each letter */ \
                          + 1) /* One Entry for other chars */
 
+/** In which mode should the program run? */
+enum OutputMode {omStdout, omOneFile, omManyFiles};
+
 /** \brief This structure holds all FILE pointers for the stream outputs. */
 struct OutFile
 {
-    /** \brief The file pointers for the topic (starting with A-Z and special
-      * chars) streams */
-    FILE* targets[FILE_COUNT];
+    enum OutputMode output_mode;
 
-    /** \brief The file stream for the metadata branch */
-    FILE* meta;
+    union
+    {
+        /** The members of this struct are used, when there should one file per
+          * starting letter be created. */
+        struct
+        {
+            /** \brief The file pointers for the topic (starting with A-Z and
+              * special chars) streams */
+            FILE* targets[FILE_COUNT];
+
+            /** \brief The file stream for the metadata branch */
+            FILE* meta;
+        } many;
+
+        /** \brief This FILE is used, when stdout or one single file is used. */
+        FILE* single;
+    } files;
 
     /** \brief The filename template */
     const char* name_template;
@@ -82,6 +98,10 @@ FILE* files_get_meta(struct OutFile* of);
 char files_page_character(char const* page_title);
 
 int files_convert_char(char in);
+
+enum TemplateKind{tkNone, tkSingle, tkReplace, tkError};
+
+enum TemplateKind check_template(const char* name_template);
 
 #ifdef __cplusplus
 }

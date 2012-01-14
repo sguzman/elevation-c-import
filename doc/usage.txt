@@ -9,14 +9,15 @@ a `git fast-import` stream to feed git.
 
 .. code-block:: sh
 
-  $ ./elevation -o stream_%c.git dump.xml 
-  $ for 
-    GIT_DIR=wiki.git git fast-import --date-format=rfc2822
+  git init --bare wiki.git
+  ./elevation dump.xml |GIT_DIR=wiki.git git fast-import --date-format=rfc2822
 
 Handling on Windows
 -------------------
 Since the current output handling requires a case-sensitive file system, it is
-at the current state impossible to use elevation on windows.
+at the current state impossible to use elevation on windows. The alternative to
+write the output to stdout is also not available on windows, since windows
+changes the newline characters there.
 
 Special parameters
 ------------------
