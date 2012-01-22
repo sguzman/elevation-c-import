@@ -10,12 +10,115 @@ a `git fast-import` stream to feed git.
 .. code-block:: sh
 
   git init --bare wiki.git
-  ./elevation dump.xml |GIT_DIR=wiki.git git fast-import --date-format=rfc2822
+  ./elevation dump.xml | GIT_DIR=wiki.git git fast-import --date-format=rfc2822
 
-Special parameters
-------------------
+Parameters
+----------
 
-TO BE DONE
+Basic mode
+++++++++++
+
+Elevation has one required parameter: the input file. Due to a limitation of
+libxml2 it is impossible to run elevation as filter. When no other parameters
+are specified, elevation reads the given input file, and print the fast-import
+script to stdout.
+
+Output redirection
+++++++++++++++++++
+
+Elevation can write the output stream to a file. The output can be written to
+one single file, or many different files.
+
+One output stream
+~~~~~~~~~~~~~~~~~
+
+The simple case is to write the complete stream to a single file. The is
+achieved by giving a ``--output=file`` parameter, with the limitation that the
+file name must not contain a percent (%) character. The output file consists of
+the meta branch and all deriving page branches. This mode is equivalent to
+redirecting the program output to a file.
+
+Many output streams
+~~~~~~~~~~~~~~~~~~~
+
+For big wiki instances one single file tend to make git eat up lots of RAM and
+slow down the entire process. To mitigate this problem there exist a mode where
+one file is created for each starting page letter. To enable this behavior the
+output parameter is given a filename template, which contains one ``%s``
+sequence, which is then replaced by the page letter for each output file. Also
+there will one ``meta`` file created, which contains the meta data of the wiki.
+When the parameter ``--output=mywiki.%s.fi`` is specified, the following files
+are created:
+
+
++----------------+------------------------------+
+| File           | Content                      |
++================+==============================+
+| mywiki.meta.fi | The meta data                |
++----------------+------------------------------+
+| mywiki.a.fi    | Letter A                     |
++----------------+------------------------------+
+| mywiki.b.fi    | Letter B                     |
++----------------+------------------------------+
+|  [Omitted Letters C-X]                        |
++----------------+------------------------------+
+| mywiki.y.fi    | Letter Y                     |
++----------------+------------------------------+
+| mywiki.z.fi    | Lezzer Z                     |
++----------------+------------------------------+
+| mywiki._.fi    | Numbers and other characters |
++----------------+------------------------------+
+
+The important difference to the single output mode is, that the files for each
+letter are not self contained. The meta file must be imported prior to the
+import of the letter file, since the stream in the letter file does refer the
+``meta``-branch, which is contained in the ``meta`` file.
+
+Named pipes
+~~~~~~~~~~~
+**This function is not available in the windows version.**
+
+The ``--pipes``-Option is used to instruct the program to create named pipes
+instead of plain files. Pipe creation is done both in single and multiple file
+output.
+
+When the multiple file output mode is chosen, the file operations are executed
+in the following order:
+
+#. All pipes are created, if they don't exist already
+#. The wiki meta data are written to the meta pipe
+#. When the meta data are finished, the meta pipe is closed.
+#. Each wiki page is written to the corresponding page (letter) pipe
+#. When the input file is finished, all page pipes are closed.
+
+The rationale about this behavior was that an import with the following
+pseudo-code would be possible:
+
+.. code-block:: sh
+
+ # avoid race condition between elevation and the following import
+ mkfifo import.meta.fi
+
+ # start elevation
+ elevation --output import.%s.fi &
+
+ # import the meta branch, this process ends when elevation
+ # closes the meta pipe
+ GIT_DIR=meta.git git fast-import --date-format=rfc2822 < import.meta.git
+ git init --bare meta.git
+
+ for SUB in a b c d e f g  h i j k l m n o p q r s t u v w x y z _
+ do
+    # create a clone of the meta repo for each letter
+    git clone --mirror --bare meta.git $SUB.git
+    # start the import in the background
+    GIT_DIR=$sub.git git fast-import --date-format=rfc2822 < import.$SUB.fi &
+ done
+ wait
+
+Unfortunately there was no time saving in this use case, since all git processes
+consume so much memory that the host was continuously swapping. This option is
+currently there for historic reasons, and may be removed in the future.
 
 After the conversion
 --------------------

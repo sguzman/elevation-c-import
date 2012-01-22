@@ -26,16 +26,18 @@ use case. Most of the time edits at the same time are unrelated.
 Because of the independence of the different pages, I decided to give each page
 its own branch.
 
-Usage reason
-............
+Advantages from the user perspective
+....................................
 
 Elevation creates one branch per wiki-page, which contains all revisions of
 this page. This means that this branch contains all revisions of this page,
 without the revisions of other pages.
 
-There are two advantages: it is easy to create a new branch for this single
-page, and merge this page back, and also it is possible to create a git clone
-for only this page, without the need to clone the entire wiki history.
+There are two advantages:
+
+#. One can easily create a git clone for one specific page only
+#. Branching off one page does not infer with other pages, all pages are
+   insulated against each other.
 
 Technical reason
 ................
