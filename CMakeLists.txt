@@ -1,7 +1,7 @@
 project(elevation C)
 cmake_minimum_required(VERSION 2.6)
 
-if(not ${LIBXML2DIR})
+if("" STREQUAL "${LIBXML2DIR}")
     include(FindLibXml2)
 else()
     # I had a hard time to figure out how to give the list of libraries via
